@@ -3,9 +3,7 @@ package up5.ia.checkers;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 
-
 public class Lanceur {
-
 	
 	public static void main(String[] args) {
 		try{
@@ -16,9 +14,7 @@ public class Lanceur {
 		f.setSize(600, 600);
 		f.setLocationRelativeTo(null);
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		f.add(new Plateau(9));
+		f.add(new Damier());
 		f.setVisible(true);
-
 	}
-
 }

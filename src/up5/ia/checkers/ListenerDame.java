@@ -3,23 +3,21 @@ package up5.ia.checkers;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+public class ListenerDame extends MouseAdapter{
 
-public class ListenerPion extends MouseAdapter {
-	
 	private Damier damier;
-	private Pion pion;
+	private Dame dame;
 	
-	public ListenerPion(Pion pion, Damier damier){
+	public ListenerDame(Dame dame, Damier damier){
 		this.damier=damier;
-		this.pion=pion;
+		this.dame=dame;
 	}
 
 	/**
 	 * DOIT FAIRE BCP DE CHOSES A DERTERMINER
 	 */
 	public void mousePressed(MouseEvent arg0) {
-		damier.afficherCoups(pion);
+		damier.afficherCoups(dame);
 		// TO DO
 	}
-
 }

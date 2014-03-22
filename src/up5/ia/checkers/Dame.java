@@ -6,11 +6,11 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 
-public class Pion extends Piece {
+public class Dame extends Piece {
 
 	private static final long serialVersionUID = 1436178861615738480L;
 
-	public Pion(Couleur couleur) {
+	public Dame(Couleur couleur) {
 		this.couleur = couleur;
 		setOpaque(false);
 		switch (couleur) {
@@ -25,9 +25,10 @@ public class Pion extends Piece {
 		}
 	}
 	
+	// A modifier pour que la dame ne ressemble pas à un pion
 	/**
 	 * ...
-	 * @param ...
+	 * @param g ...
 	 */
 	@Override
 	public void paintComponent(Graphics g){
@@ -44,5 +45,4 @@ public class Pion extends Piece {
 		g2d.setPaint(paint);
 		g.fillOval(5, 5, getWidth()-10, getHeight()-10);
 	}
-
 }

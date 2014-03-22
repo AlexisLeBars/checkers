@@ -15,10 +15,12 @@ public class Case extends JPanel {
 	private static final long serialVersionUID = -1839026893240660968L;
 	
 	private Couleur couleur;
+	private boolean intermediaire;
+	private boolean finale;
 	private boolean selectionnee;
 
 	public Case(Couleur couleur){
-		setLayout(new GridLayout(1,0));
+		setLayout(new GridLayout(1,1));
 		this.couleur=couleur;
 		initCouleur();
 	}
@@ -27,35 +29,60 @@ public class Case extends JPanel {
 		return couleur;
 	}
 
-	public boolean isSelectionnee() {
-		return selectionnee;
+	public boolean isIntermediaire() {
+		return intermediaire;
 	}
 
-	public void setSelectionnee(boolean selectionnee) {
+	public void setIntermediaire(boolean intermediaire) {
+		this.intermediaire = intermediaire;
+		initCouleur();
+	}
+	
+	public boolean isFinale(){
+		return finale;
+	}
+	
+	public void setFinale(Boolean finale){
+		this.finale=finale;
+		initCouleur();
+	}
+	
+	public boolean isSelectionnee(){
+		return selectionnee;
+	}
+	
+	public void setSelectionnee(Boolean selectionnee){
 		this.selectionnee = selectionnee;
-		if(selectionnee){
+	}
+	
+	/**
+	 * Réinitialise l'aspect d'une case selon ses attributs intermediaire, finale, selectionnee
+	 */
+	private void initCouleur(){
+		switch(couleur){
+			case BLANC :	
+				setBackground(Color.WHITE);
+				setForeground(new Color(200, 200, 200));
+				break;
+			case NOIR :
+				setBackground(Color.GRAY);
+				setForeground(new Color(20, 20, 20));
+				break;
+		}
+
+		if(intermediaire){
 			setBackground(Color.BLUE);
 			setForeground(Color.LIGHT_GRAY);
 		}
-		else {
-			initCouleur();
+		if(finale){
+			// TO DO
 		}
 	}
 	
-	private void initCouleur(){
-		switch(couleur){
-		case BLANC :
-			setBackground(Color.WHITE);
-			setForeground(new Color(200, 200, 200));
-			
-			break;
-		case NOIR :
-			setBackground(Color.GRAY);
-			setForeground(new Color(20, 20, 20));
-			break;
-		}
-	}
-	
+	/**
+	 * ....
+	 * @param g ....
+	 */
 	@Override
 	public void paintComponent(Graphics g){
 		Paint paint;

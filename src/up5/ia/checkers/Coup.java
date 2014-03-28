@@ -2,17 +2,47 @@ package up5.ia.checkers;
 
 import java.util.ArrayList;
 
-public class Coup {
+public class Coup implements Cloneable{
 
-	private Pion pionDeplace;
-	private ArrayList<Case> casesIntermediaires;
-	private ArrayList<Pion> pionsSupprimes;
-	private Case caseFinale;
+	private int positionPieceDeplacee;
+	private ArrayList<Integer> positionsPiecesSupprimees;
+	private int positionCaseFinale;
+
+	Coup(final int positionPieceDeplacee){
+		this.positionPieceDeplacee=positionPieceDeplacee;
+		this.positionsPiecesSupprimees=new ArrayList<Integer>();
+		this.positionCaseFinale=0;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Coup clone() throws CloneNotSupportedException {
+		Coup copie = (Coup) super.clone();
+		copie.setPositionsPiecesSupprimees( (ArrayList<Integer>) this.positionsPiecesSupprimees.clone());
+		return copie;
+	}
 	
-	Coup(Pion pionDeplace, ArrayList<Case> casesIntermediaires, ArrayList<Pion> pionsSupprimes, Case caseFinale){
-		this.pionDeplace=pionDeplace;
-		this.casesIntermediaires=casesIntermediaires;
-		this.pionsSupprimes=pionsSupprimes;
-		this.caseFinale=caseFinale;
+	public void setPositionsPiecesSupprimees(final ArrayList<Integer> positionsPiecesSupprimees){
+		this.positionsPiecesSupprimees = positionsPiecesSupprimees;
+	}
+	
+	public void setPositionCaseFinale(final Integer positionCaseFinale){
+		this.positionCaseFinale = positionCaseFinale;
+	}
+	
+	public ArrayList<Integer> getPositionsPiecesSupprimees(){
+		return this.positionsPiecesSupprimees;
+	}
+	
+	public int getPositionCaseFinale(){
+		return this.positionCaseFinale;
+	}
+
+	public int getPositionPieceDeplacee(){
+		return this.positionPieceDeplacee;
+	}
+
+	public void addPositionPieceSupprimee(final int positionPiece) {
+		positionsPiecesSupprimees.add(positionPiece);
 	}
 }

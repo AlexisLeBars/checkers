@@ -10,7 +10,8 @@ public class Dame extends Piece {
 
 	private static final long serialVersionUID = 1436178861615738480L;
 
-	public Dame(Couleur couleur) {
+	public Dame(final Couleur couleur, final int position) {
+		super(position);
 		this.couleur = couleur;
 		setOpaque(false);
 		switch (couleur) {
@@ -26,10 +27,6 @@ public class Dame extends Piece {
 	}
 	
 	// A modifier pour que la dame ne ressemble pas à un pion
-	/**
-	 * ...
-	 * @param g ...
-	 */
 	@Override
 	public void paintComponent(Graphics g){
 		Paint paint;

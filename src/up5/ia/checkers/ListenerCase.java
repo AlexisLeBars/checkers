@@ -9,20 +9,25 @@ public class ListenerCase extends MouseAdapter{
 	private Case case1;
 	private Plateau plateau;
 
-	public ListenerCase(Case case1, Plateau plateau) {
+	public ListenerCase(final Case case1, final Plateau plateau) {
 		this.case1 = case1;
 		this.plateau = plateau;
 	}
 
-	/**
-	 * DOIT FAIRE BCP DE CHOSES A DERTERMINER
-	 */
 	public void mousePressed(MouseEvent arg0) {
-		if(case1.isIntermediaire()){
-			// TO DO
-		}
+
 		if(case1.isFinale()){
-			// TO DO
+			Coup coup = ((Damier) this.plateau).getCoupEnCours();
+			coup.setPositionCaseFinale(case1.getPosition());
+			if( ((Damier) this.plateau).isCoupValide(coup) ){
+				((Damier) this.plateau).executionCoup(coup);
+				((Damier) this.plateau).setCoupEnCours(null);
+			}
+			else{
+				((Damier) this.plateau).setCoupEnCours(null);
+				((Damier) this.plateau).reinitEtatCases();
+				((Damier) this.plateau).reinitEtatPieces(((Damier) this.plateau).getTrait());
+			}
 		}
 	}
 }

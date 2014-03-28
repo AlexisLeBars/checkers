@@ -9,23 +9,22 @@ public class Plateau extends JPanel {
 
 	private static final long serialVersionUID = 6726708245444190460L;
 
-	public Plateau(int taille){
+	public Plateau(final int taille){
 		setLayout(new GridLayout(taille, taille));
 
-		for(int i=0; i<taille; i++){
-			for(int j=0; j<taille; j++){
-				if((j%2==0 && i%2==0) || (j%2!=0 && i%2!=0)){
-					ajouterCase(Couleur.BLANC);
-				}
-				else{
-					ajouterCase(Couleur.NOIR);
-				}
+		int position = 0;
+		for(int ligne=0; ligne<taille; ligne++){
+			for(int colonne=0; colonne<taille; colonne++){
+				if((colonne%2==0 && ligne%2==0) || (colonne%2!=0 && ligne%2!=0))
+					ajouterCase(Couleur.BLANC, 0);
+				else
+					ajouterCase(Couleur.NOIR, ++position);
 			}
 		}
 	}
 
-	private void ajouterCase(Couleur couleur){
-		Case case1 = new Case(couleur);
+	private void ajouterCase(final Couleur couleur, final int position){
+		Case case1 = new Case(couleur,position);
 		case1.addMouseListener(new ListenerCase(case1, this));
 		add(case1);
 	}

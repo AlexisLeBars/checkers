@@ -10,7 +10,8 @@ public class Pion extends Piece {
 
 	private static final long serialVersionUID = 1436178861615738480L;
 
-	public Pion(Couleur couleur) {
+	public Pion(final Couleur couleur, final int position) {
+		super(position);
 		this.couleur = couleur;
 		setOpaque(false);
 		switch (couleur) {
@@ -25,10 +26,6 @@ public class Pion extends Piece {
 		}
 	}
 	
-	/**
-	 * ...
-	 * @param ...
-	 */
 	@Override
 	public void paintComponent(Graphics g){
 		Paint paint;

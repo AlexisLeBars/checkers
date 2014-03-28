@@ -1,49 +1,107 @@
 package up5.ia.checkers;
 
+import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.regex.Pattern;
 
 public class Damier extends Plateau {
 	
 	private static final long serialVersionUID = 6726708245444190461L;
 
 	private static final int TAILLE=10;
-	private static final int NB_LIGNES=4; // nb de ligne de pieces d'une couleur lors de la disposition des pieces
-	private byte[][] damier;
+	private int[][] damier;
+	public static final int VIDE=0;
+	public static final int PION_BLANC=1;
+	public static final int PION_NOIR=2;
+	public static final int DAME_BLANC=3;
+	public static final int DAME_NOIR=4;
+	public static final int PIECE_PRISE=5;
 	
-	private ArrayList<Piece> piecesNoirs;
+	private final String priseRegex = "(^"+PION_BLANC+"["+PION_NOIR+""+DAME_NOIR+"]"+VIDE+")|(^"+PION_NOIR+"["+PION_BLANC+""+DAME_BLANC+"]"+VIDE+")|(^"+DAME_BLANC+""+VIDE+"*["+PION_NOIR+""+DAME_NOIR+"]"+VIDE+")|(^"+DAME_NOIR+""+VIDE+"*["+PION_BLANC+""+DAME_BLANC+"]"+VIDE+")";
+	private final String deplacementRegex = "^[1-4][^0]^["+PION_BLANC+"-"+DAME_NOIR+"][^"+VIDE+"]";
+
 	private ArrayList<Piece> piecesBlancs;
-	private ArrayList<Coup> coupsBlancPossibles;
-	private ArrayList<Coup> coupsNoirPossibles;
+	private ArrayList<Piece> piecesNoirs;
+
+	private ArrayList<Coup> coupsPossibles;
 	private Coup coupEnCours;
 
-	private boolean tourNoir;
+	private Couleur traitAux;
 
 	public Damier(){
 		super(TAILLE);
-damier=new byte[TAILLE][TAILLE];
-for(int i=0; i<((TAILLE-1)/2); i++){
-	for(int j=1-i%2; j<TAILLE; j+=2){
-		damier[i][j] = 2; // pion noir
-		damier[i+TAILLE-NB_LIGNES][j] = 1; //pion blanc
-	}
-}
-		tourNoir=false;
-		piecesNoirs = new ArrayList<Piece>();
+		damier=new int[TAILLE][TAILLE];
+		for(int[] ligne : damier)
+			Arrays.fill(ligne,VIDE);
+		traitAux=Couleur.BLANC;
 		piecesBlancs = new ArrayList<Piece>();
-		coupsBlancPossibles = new ArrayList<Coup>();
-		coupsNoirPossibles = new ArrayList<Coup>();
+		piecesNoirs = new ArrayList<Piece>();
+		coupsPossibles = new ArrayList<Coup>();
+		coupEnCours = null;
 		disposerPions();
 	}
 
-	/**
-	 * Crée un pion de la couleur spécifiée et sur la case du damier spécifiée et l'ajoute à la liste des pièces de la couleur spécifiée
-	 * @param couleur est la couleur du pion
-	 * @param case1 est la case où sera placé le pion
-	 * @return retourne le pion ainsi créée
-	 */
-	private Pion creerPion(Couleur couleur, Case case1){
-		Pion pion = new Pion(couleur);
-		pion.addMouseListener(new ListenerPion(pion, this));
+	public Point positionToCoordonnees(final int position){
+		int ligne = (position-1)/5;
+		int colonne=0;
+		switch(position%10){
+			case 0 : colonne = 8; break;
+			case 1 : colonne = 1; break;
+			case 2 : colonne = 3; break;
+			case 3 : colonne = 5; break;
+			case 4 : colonne = 7; break;
+			case 5 : colonne = 9; break;
+			case 6 : colonne = 0; break;
+			case 7 : colonne = 2; break;
+			case 8 : colonne = 4; break;
+			case 9 : colonne = 6; break;	
+		}
+		return new Point(ligne,colonne);
+	}
+	
+	public void setCoupsPossibles(final ArrayList<Coup> coupsPossibles){
+		this.coupsPossibles = coupsPossibles;
+	}
+
+	public void setCoupEnCours(final Coup coup){
+		this.coupEnCours=coup;
+	}
+
+	public Case getCase(final int position){
+		return (Case) getComponent( (int) (positionToCoordonnees(position).getY()+positionToCoordonnees(position).getX()*TAILLE) );
+	}
+	
+	public Piece getPiece(final int position){
+		return (Piece) ( (Case) getComponent( (int) (positionToCoordonnees(position).getY()+positionToCoordonnees(position).getX()*TAILLE) )).getComponent(0);
+	}
+	
+	public Couleur getTrait(){
+		return this.traitAux;
+	}
+
+	public Coup getCoupEnCours(){
+		return this.coupEnCours;
+	}
+
+	private void creerPion(int[][] damier, final Couleur couleur, final int position){
+		switch(couleur){
+			case BLANC :
+				damier[(int) positionToCoordonnees(position).getX()][(int) positionToCoordonnees(position).getY()] = PION_BLANC;
+				break;
+			case NOIR :
+				damier[(int) positionToCoordonnees(position).getX()][(int) positionToCoordonnees(position).getY()] = PION_NOIR;
+				break;
+		}
+	}
+
+	private Pion creerPion(final Couleur couleur, final int position){
+		
+		creerPion(damier, couleur, position);
+		
+		Pion pion = new Pion(couleur, position);
+		pion.addMouseListener(new ListenerPiece(pion, this));
+		Case case1 = getCase(position);
 		case1.add(pion);
 		switch(couleur){
 			case BLANC :
@@ -55,15 +113,25 @@ for(int i=0; i<((TAILLE-1)/2); i++){
 		}
 		return pion;
 	}
-	/**
-	 * Crée une dame de la couleur spécifiée et sur la case du damier spécifiée et l'ajoute à la liste des pièces de la couleur spécifiée
-	 * @param couleur est la couleur de la dame
-	 * @param case1 est la case où sera placée la dame
-	 * @return retourne la dame ainsi créée
-	 */
-	private Dame creerDame(Couleur couleur, Case case1){
-		Dame dame = new Dame(couleur);
-		dame.addMouseListener(new ListenerDame(dame, this));
+
+	private void creerDame(int[][] damier, final Couleur couleur, final int position){
+		switch(couleur){
+			case BLANC :
+				damier[(int) positionToCoordonnees(position).getX()][(int) positionToCoordonnees(position).getY()] = DAME_BLANC;
+				break;
+			case NOIR :
+				damier[(int) positionToCoordonnees(position).getX()][(int) positionToCoordonnees(position).getY()] = DAME_NOIR;
+				break;
+		}
+	}
+
+	private Dame creerDame(final Couleur couleur,final int position){
+		
+		creerDame(damier, couleur, position);
+		
+		Dame dame = new Dame(couleur, position);
+		dame.addMouseListener(new ListenerPiece(dame, this));
+		Case case1 = getCase(position);
 		case1.add(dame);
 		switch(couleur){
 		case BLANC :
@@ -75,74 +143,216 @@ for(int i=0; i<((TAILLE-1)/2); i++){
 		}
 		return dame;
 	}
+
+	private void disposerPions(){
+		for(int position=1; position<21; position++)
+			creerPion(Couleur.NOIR, position);
+		for(int position=31; position<51; position++)
+			creerPion(Couleur.BLANC, position);
+	}
 	
-	/**
-	 * Supprime une piece sur le damier et dans la liste des pièces
-	 * @param piece est la pièce à supprimer
-	 */
-	private void supprimerPiece(Piece piece){
-		switch(piece.getCouleur()){
-			case BLANC :
-				piecesBlancs.remove(piece);
-				break;
-			case NOIR :
-				piecesNoirs.remove(piece);
-				break;
-		}
-		Case case1 = (Case) piece.getParent();
+	private void marquerPieceSupprimee(final int position){
+		damier[(int) positionToCoordonnees(position).getX()][(int) positionToCoordonnees(position).getY()] = PIECE_PRISE;
+	}
+
+	private void supprimerPiece(int[][] damier, final int position){
+		damier[(int) positionToCoordonnees(position).getX()][(int) positionToCoordonnees(position).getY()] = VIDE;
+	}
+
+	private void supprimerPiece(final int position){
+
+		int piece = damier[(int) positionToCoordonnees(position).getX()][(int) positionToCoordonnees(position).getY()] = VIDE;
+		if(piece == PION_BLANC || piece == DAME_BLANC)
+			piecesBlancs.remove(piece);
+		else if(piece == PION_NOIR || piece == DAME_NOIR)
+			piecesNoirs.remove(piece);
+
+		supprimerPiece(damier, position);
+
+		Case case1 = getCase(position);
 		case1.removeAll();
 		case1.validate();
 		case1.repaint();
 	}
-	
-	/**
-	 * Déplace une pièce sur la case destination spécifiée
-	 * @param piece est la pièce à déplacer
-	 * @param destination est la case sur laquelle la pièce est déplacée
-	 */
-	private void deplacerPiece(Piece piece,Case destination){
-		Case provenance = (Case) piece.getParent();
-		provenance.removeAll();
-		provenance.validate();
-		provenance.repaint();
-		destination.add(piece);
-		destination.validate();
-		destination.repaint();
+
+	private void deplacerPiece(int[][] damier, final int source,final int destination){
+		int sourceX = (int) positionToCoordonnees(source).getX();
+		int sourceY = (int) positionToCoordonnees(source).getY();
+		int piece = damier[sourceX][sourceY];
+		int destinationX = (int) positionToCoordonnees(source).getX();
+		int destinationY = (int) positionToCoordonnees(source).getY();
+		
+		damier[sourceX][sourceY] = VIDE;
+		switch(piece){
+			case PION_BLANC :
+				damier[destinationX][destinationY] = PION_BLANC; break;
+			case DAME_BLANC :
+				damier[destinationX][destinationY] = DAME_BLANC; break;
+			case PION_NOIR :
+				damier[destinationX][destinationY] = PION_NOIR; break;
+			case DAME_NOIR :
+				damier[destinationX][destinationY] = DAME_NOIR; break;
+		}
 	}
 
-	/**
-	 * Dispose les pions pour commencer un nouvelle partie de Dames. Chaque pion est ajouté selon sa couleur dans la liste des pièces correspondante.
-	 */
-	private void disposerPions(){
-		for(int i=0; i<((TAILLE-1)/2); i++){
-			for(int j=1-i%2; j<TAILLE; j+=2){
-				creerPion(Couleur.NOIR,getCase(i,j));
-				creerPion(Couleur.BLANC,getCase(i+TAILLE-NB_LIGNES,j));
+	private void deplacerPiece(final int source,final int destination){
+	
+		deplacerPiece(damier, source, destination);
+		
+		Case provenanceCase = getCase(source);
+		Case destinationCase = getCase(destination);
+		destinationCase.add(getPiece(source));
+		provenanceCase.removeAll();
+		provenanceCase.validate();
+		provenanceCase.repaint();
+		destinationCase.validate();
+		destinationCase.repaint();
+	}
+	
+	private boolean testDiagonale(final int[][] damier,final int position, final Point direction, final String regex){
+		Point coordonnees = positionToCoordonnees(position);
+		int ligne = (int) coordonnees.getX();
+		int colonne = (int) coordonnees.getY();
+		
+		int directionLigne = (int) direction.getX();
+		int directionColonne = (int) direction.getY();
+		
+		StringBuilder diagonale = new StringBuilder( String.valueOf(damier[ligne][colonne]) );
+		try{
+			for(int i=1;true;i++){
+				diagonale.append(damier[ligne+i*directionLigne][colonne+i*directionColonne]);
+			}
+		}
+		catch(Exception e){
+		}
+
+		return Pattern.matches(regex, diagonale);
+	}
+
+// A COMPLETER
+	private void calculerCoupsPossibles(final int[][] damier, final int position, final Coup coup){
+	// Puis-je prendre ?
+		boolean prisePossible = false;
+		if( testDiagonale(damier,position,new Point(-1,-1),priseRegex) ){
+			prisePossible=true;
+			// pour toutes les prises possibles on rappelle la fonction
+		}
+		if( testDiagonale(damier,position,new Point(-1,1),priseRegex) ){
+			prisePossible=true;
+			// pour toutes les prises possibles on rappelle la fonction
+		}
+		if( testDiagonale(damier,position,new Point(1,1),priseRegex) ){
+			prisePossible=true;
+			// pour toutes les prises possibles on rappelle la fonction
+		}
+		if( testDiagonale(damier,position,new Point(1,-1),priseRegex) ){
+			prisePossible=true;
+			// pour toutes les prises possibles on rappelle la fonction
+		}
+	// je ne peux pas prendre, et je me suis d�j� d�plac�
+		if( !prisePossible && (coup.getPositionCaseFinale() != 0 || !coup.getPositionsPiecesSupprimees().isEmpty()) ){
+			Coup clone = null;
+			try{
+				clone = (Coup) coup.clone();
+			}
+			catch(Exception e){
+			}
+			clone.setPositionCaseFinale(position);
+			this.coupsPossibles.add(clone);
+		}
+	// je ne peux pas prendre, et je ne me suis pas d�j� d�plac�, puis-je me d�placer ?
+		else if( !prisePossible ){
+			if(  testDiagonale(damier,position,new Point(-1,-1),deplacementRegex) ){
+				// pour tous les d�placements possibles, j'ajoute un coup dans les coupsPossibles
+			}
+			if( testDiagonale(damier,position,new Point(-1,1),deplacementRegex) ){
+				// pour tous les d�placements possibles, j'ajoute un coup dans les coupsPossibles
+			}
+			if( testDiagonale(damier,position,new Point(1,1),deplacementRegex) ){
+				// pour tous les d�placements possibles, j'ajoute un coup dans les coupsPossibles
+			}
+			if( testDiagonale(damier,position,new Point(1,-1),deplacementRegex) ){
+				// pour tous les d�placements possibles, j'ajoute un coup dans les coupsPossibles
+			}
+			// je ne peux pas prendre, je ne me suis pas d�j� d�plac�, je ne peux pas me d�placer -> aucun coup possible
+		}
+	}
+
+	public void calculerCoupsPossibles(final Couleur couleur){
+		ArrayList<Piece> pieces = (couleur == Couleur.BLANC)?piecesBlancs:piecesNoirs;
+		for(Piece piece : pieces)
+			calculerCoupsPossibles(damier, piece.getPosition(),new Coup(piece.getPosition()));
+		supprimerCoupsInterdits(coupsPossibles);
+	}
+
+	public void supprimerCoupsInterdits(ArrayList<Coup> coups){
+		// TO DO
+	}
+
+	public void afficherCoups(final Piece piece){
+	
+		reinitEtatCases();
+		reinitEtatPieces(piece.getCouleur());
+	
+		if(piece.getCouleur() == traitAux){
+			for(Coup coup : coupsPossibles){
+				if( coup.getPositionPieceDeplacee() == piece.getPosition() ){
+					for(int positionPieceSupprimee : coup.getPositionsPiecesSupprimees() )
+						getPiece(positionPieceSupprimee).setSupprimee(true);
+					(getCase(coup.getPositionCaseFinale())).setFinale(true);
+				}
 			}
 		}
 	}
 
-	public Case getCase(int i, int j){
-		return (Case) getComponent(j+i*TAILLE);
-	}
-
-	public Case getCase(int i){
-		return (Case) getComponent(i);
-	}
-
-	/**
-	 * Liste tous les coups possibles pour le joueur de la couleur spécifiée
-	 * @param couleur est la couleur du joueur
-	 */
-	public void calculerCoupsPossible(Couleur couleur){
-		// TO DO
+	public void reinitEtatCases(){
+		for(int i=0; i<TAILLE*TAILLE; i++)
+			((Case) getComponent(i)).setEtatParDefault();
 	}
 	
-	/**
-	 * Affiche les coups possible pour une pièce donnée en modifiant l'apparence de certaines cases 
-	 * @param piece est la pièce dont les coups possibles sont à afficher
-	 */
-	public void afficherCoups(Piece piece){
-		// TO DO
+	public void reinitEtatPieces(final Couleur traitAux){
+		switch(traitAux){
+			case BLANC :
+				for(Piece pieceReinit: piecesBlancs)
+					pieceReinit.setSupprimee(false);
+				break;
+			case NOIR :
+				for(Piece pieceReinit: piecesNoirs)
+					pieceReinit.setSupprimee(false);
+				break;
+		}
+	}
+
+	public boolean isCoupValide(final Coup coup){
+		for(Coup coupPossible : coupsPossibles){
+			if( (coupPossible.getPositionPieceDeplacee() == coup.getPositionPieceDeplacee()) && (coupPossible.getPositionCaseFinale() == coup.getPositionCaseFinale()) )
+				return true;
+		}
+		return false;
+	}
+
+	public void executionCoup(final Coup coup){
+		int source = coup.getPositionPieceDeplacee();
+		int destination = coup.getPositionCaseFinale();
+		
+		deplacerPiece(source,destination);
+		for(int positionsPiecesSupprimees : coup.getPositionsPiecesSupprimees())
+			supprimerPiece(positionsPiecesSupprimees);
+		
+		Point coordonneeFinale = positionToCoordonnees(destination);
+		if( coordonneeFinale.getY()==0  && traitAux==Couleur.BLANC ){
+			supprimerPiece(destination);
+			creerDame(traitAux,destination);
+		}
+		else if( coordonneeFinale.getY()==(TAILLE-1)  && traitAux==Couleur.NOIR ){
+			supprimerPiece(destination);
+			creerDame(traitAux,destination);
+		}
+	
+		reinitEtatCases();
+		reinitEtatPieces(traitAux);
+	
+		traitAux = (traitAux==Couleur.BLANC)?Couleur.NOIR:Couleur.BLANC;
+		calculerCoupsPossibles(traitAux);
 	}
 }

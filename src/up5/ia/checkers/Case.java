@@ -10,54 +10,25 @@ import java.awt.Paint;
 import javax.swing.JPanel;
 
 
-public class Case extends JPanel {
+public class Case extends JPanel implements Cloneable{
 	
 	private static final long serialVersionUID = -1839026893240660968L;
 	
+	private int position;
 	private Couleur couleur;
-	private boolean intermediaire;
 	private boolean finale;
-	private boolean selectionnee;
 
-	public Case(Couleur couleur){
+	public Case(final Couleur couleur,final int position){
+		this.position = position;
 		setLayout(new GridLayout(1,1));
 		this.couleur=couleur;
 		initCouleur();
 	}
 
-	public Couleur getCouleur() {
-		return couleur;
+	public Case clone() throws CloneNotSupportedException {
+		return (Case) super.clone();
 	}
 
-	public boolean isIntermediaire() {
-		return intermediaire;
-	}
-
-	public void setIntermediaire(boolean intermediaire) {
-		this.intermediaire = intermediaire;
-		initCouleur();
-	}
-	
-	public boolean isFinale(){
-		return finale;
-	}
-	
-	public void setFinale(Boolean finale){
-		this.finale=finale;
-		initCouleur();
-	}
-	
-	public boolean isSelectionnee(){
-		return selectionnee;
-	}
-	
-	public void setSelectionnee(Boolean selectionnee){
-		this.selectionnee = selectionnee;
-	}
-	
-	/**
-	 * Réinitialise l'aspect d'une case selon ses attributs intermediaire, finale, selectionnee
-	 */
 	private void initCouleur(){
 		switch(couleur){
 			case BLANC :	
@@ -70,19 +41,12 @@ public class Case extends JPanel {
 				break;
 		}
 
-		if(intermediaire){
-			setBackground(Color.BLUE);
+		if(finale){
+			setBackground(Color.RED);
 			setForeground(Color.LIGHT_GRAY);
 		}
-		if(finale){
-			// TO DO
-		}
 	}
-	
-	/**
-	 * ....
-	 * @param g ....
-	 */
+
 	@Override
 	public void paintComponent(Graphics g){
 		Paint paint;
@@ -97,5 +61,26 @@ public class Case extends JPanel {
 		paint = new GradientPaint(0,0, getBackground(), getWidth(), getHeight(), getForeground());
 		g2d.setPaint(paint);
 		g.fillRect(0, 0, getWidth(), getHeight());
+	}
+
+	public boolean isFinale(){
+		return finale;
+	}
+
+	public void setFinale(final Boolean finale){
+		this.finale=finale;
+		initCouleur();
+	}
+
+	public void setEtatParDefault(){
+		setFinale(false);
+	}
+
+	public Couleur getCouleur() {
+		return couleur;
+	}
+	
+	public int getPosition(){
+		return position;
 	}
 }

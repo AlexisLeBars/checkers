@@ -20,18 +20,18 @@ public class Lanceur {
 		// Commenté car pas encore implémenté
 		//damier.setCoupsPossibles(damier.calculerCoupsPossibles(Couleur.BLANC));
 		
-	//ligne de test
+	//lignes de test
 		Coup coup1 = new Coup(31);
-		coup1.setPositionCaseFinale(26);
+		coup1.setPositionFinale(26);
 		Coup coup2 = new Coup(31);
-		coup2.setPositionCaseFinale(27);
+		coup2.setPositionFinale(27);
 	
 		ArrayList<Coup> coupsPossibles = new ArrayList<Coup>();
 		coupsPossibles.add(coup1);
 		coupsPossibles.add(coup2);
 		
 		damier.setCoupsPossibles(coupsPossibles);
-	// ligne de test
+	// lignes de test
 		
 		f.add(damier);
 		f.setVisible(true);

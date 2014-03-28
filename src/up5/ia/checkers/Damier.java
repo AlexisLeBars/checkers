@@ -17,6 +17,10 @@ public class Damier extends Plateau {
 	public static final int DAME_BLANC=3;
 	public static final int DAME_NOIR=4;
 	public static final int PIECE_PRISE=5;
+	public static final Point DIAG_HG = new Point(-1,-1);
+	public static final Point DIAG_HD = new Point(-1,1);
+	public static final Point DIAG_BG = new Point(1,-1);
+	public static final Point DIAG_BD = new Point(1,1);
 	
 	private final String priseRegex = "(^"+PION_BLANC+"["+PION_NOIR+""+DAME_NOIR+"]"+VIDE+")|(^"+PION_NOIR+"["+PION_BLANC+""+DAME_BLANC+"]"+VIDE+")|(^"+DAME_BLANC+""+VIDE+"*["+PION_NOIR+""+DAME_NOIR+"]"+VIDE+")|(^"+DAME_NOIR+""+VIDE+"*["+PION_BLANC+""+DAME_BLANC+"]"+VIDE+")";
 	private final String deplacementRegex = "^[1-4][^0]^["+PION_BLANC+"-"+DAME_NOIR+"][^"+VIDE+"]";
@@ -151,7 +155,7 @@ public class Damier extends Plateau {
 			creerPion(Couleur.BLANC, position);
 	}
 	
-	private void marquerPieceSupprimee(final int position){
+	private void marquerPieceSupprimee(int[][] damier ,final int position){
 		damier[(int) positionToCoordonnees(position).getX()][(int) positionToCoordonnees(position).getY()] = PIECE_PRISE;
 	}
 
@@ -199,9 +203,11 @@ public class Damier extends Plateau {
 	
 		deplacerPiece(damier, source, destination);
 		
+		Piece piece = getPiece(source);
 		Case provenanceCase = getCase(source);
 		Case destinationCase = getCase(destination);
-		destinationCase.add(getPiece(source));
+		destinationCase.add(piece);
+		piece.setPosition(destination);
 		provenanceCase.removeAll();
 		provenanceCase.validate();
 		provenanceCase.repaint();
@@ -209,7 +215,7 @@ public class Damier extends Plateau {
 		destinationCase.repaint();
 	}
 	
-	private boolean testDiagonale(final int[][] damier,final int position, final Point direction, final String regex){
+	private ArrayList<Integer> positionsPossibles(final int[][] damier,final int position, final Point direction, final String regex){
 		Point coordonnees = positionToCoordonnees(position);
 		int ligne = (int) coordonnees.getX();
 		int colonne = (int) coordonnees.getY();
@@ -225,56 +231,75 @@ public class Damier extends Plateau {
 		}
 		catch(Exception e){
 		}
-
-		return Pattern.matches(regex, diagonale);
+// TODO
+		if( Pattern.matches(regex, diagonale) ){
+			
+		}
+		return new ArrayList<Integer>();
 	}
 
 // A COMPLETER
 	private void calculerCoupsPossibles(final int[][] damier, final int position, final Coup coup){
 	// Puis-je prendre ?
 		boolean prisePossible = false;
-		if( testDiagonale(damier,position,new Point(-1,-1),priseRegex) ){
+		ArrayList<Integer> prisesPossibles = null;
+		prisesPossibles = positionsPossibles(damier,position,DIAG_HG,priseRegex);
+		if( !prisesPossibles.isEmpty() ){
 			prisePossible=true;
 			// pour toutes les prises possibles on rappelle la fonction
 		}
-		if( testDiagonale(damier,position,new Point(-1,1),priseRegex) ){
+		prisesPossibles = positionsPossibles(damier,position,DIAG_HD,priseRegex);
+		if( !prisesPossibles.isEmpty() ){
 			prisePossible=true;
 			// pour toutes les prises possibles on rappelle la fonction
 		}
-		if( testDiagonale(damier,position,new Point(1,1),priseRegex) ){
+		prisesPossibles = positionsPossibles(damier,position,DIAG_BD,priseRegex);
+		if( !prisesPossibles.isEmpty() ){
 			prisePossible=true;
 			// pour toutes les prises possibles on rappelle la fonction
 		}
-		if( testDiagonale(damier,position,new Point(1,-1),priseRegex) ){
+		prisesPossibles = positionsPossibles(damier,position,DIAG_BG,priseRegex);
+		if( !prisesPossibles.isEmpty() ){
 			prisePossible=true;
 			// pour toutes les prises possibles on rappelle la fonction
 		}
-	// je ne peux pas prendre, et je me suis dÈj‡ dÈplacÈ
-		if( !prisePossible && (coup.getPositionCaseFinale() != 0 || !coup.getPositionsPiecesSupprimees().isEmpty()) ){
+	// je ne peux pas prendre, et je me suis d√©j√† d√©plac√©
+		if( !prisePossible && (coup.getPositionFinale() != 0 || !coup.getPositionsPiecesSupprimees().isEmpty()) ){
 			Coup clone = null;
 			try{
 				clone = (Coup) coup.clone();
 			}
 			catch(Exception e){
 			}
-			clone.setPositionCaseFinale(position);
+			clone.setPositionFinale(position);
 			this.coupsPossibles.add(clone);
 		}
-	// je ne peux pas prendre, et je ne me suis pas dÈj‡ dÈplacÈ, puis-je me dÈplacer ?
+	// je ne peux pas prendre, et je ne me suis pas d√©j√† d√©plac√©, puis-je me d√©placer ?
 		else if( !prisePossible ){
-			if(  testDiagonale(damier,position,new Point(-1,-1),deplacementRegex) ){
-				// pour tous les dÈplacements possibles, j'ajoute un coup dans les coupsPossibles
+			ArrayList<Integer> deplacementsPossibles = null;
+			Point coordonnees = positionToCoordonnees(position);
+			int piece = damier[(int) coordonnees.getX()][(int) coordonnees.getY()];
+			if(piece == PION_BLANC || piece==DAME_BLANC){
+				deplacementsPossibles = positionsPossibles(damier,position,DIAG_HG,deplacementRegex);
+				if( !deplacementsPossibles.isEmpty() ){
+					// pour tous les d√©placements possibles, j'ajoute un coup dans les coupsPossibles
+				}
+				deplacementsPossibles = positionsPossibles(damier,position,DIAG_HD,deplacementRegex);
+				if( !deplacementsPossibles.isEmpty() ){
+					// pour tous les d√©placements possibles, j'ajoute un coup dans les coupsPossibles
+				}
 			}
-			if( testDiagonale(damier,position,new Point(-1,1),deplacementRegex) ){
-				// pour tous les dÈplacements possibles, j'ajoute un coup dans les coupsPossibles
-			}
-			if( testDiagonale(damier,position,new Point(1,1),deplacementRegex) ){
-				// pour tous les dÈplacements possibles, j'ajoute un coup dans les coupsPossibles
-			}
-			if( testDiagonale(damier,position,new Point(1,-1),deplacementRegex) ){
-				// pour tous les dÈplacements possibles, j'ajoute un coup dans les coupsPossibles
-			}
-			// je ne peux pas prendre, je ne me suis pas dÈj‡ dÈplacÈ, je ne peux pas me dÈplacer -> aucun coup possible
+			else if(piece == PION_NOIR || piece==DAME_NOIR){
+				deplacementsPossibles = positionsPossibles(damier,position,DIAG_BD,deplacementRegex);
+				if( !deplacementsPossibles.isEmpty() ){
+					// pour tous les d√©placements possibles, j'ajoute un coup dans les coupsPossibles
+				}
+				deplacementsPossibles = positionsPossibles(damier,position,DIAG_BG,deplacementRegex);
+				if( !deplacementsPossibles.isEmpty() ){
+					// pour tous les d√©placements possibles, j'ajoute un coup dans les coupsPossibles
+				}
+			}	
+			// je ne peux pas prendre, je ne me suis pas d√©j√† d√©plac√©, je ne peux pas me d√©placer -> aucun coup possible
 		}
 	}
 
@@ -296,10 +321,10 @@ public class Damier extends Plateau {
 	
 		if(piece.getCouleur() == traitAux){
 			for(Coup coup : coupsPossibles){
-				if( coup.getPositionPieceDeplacee() == piece.getPosition() ){
+				if( coup.getPositionInitiale() == piece.getPosition() ){
 					for(int positionPieceSupprimee : coup.getPositionsPiecesSupprimees() )
 						getPiece(positionPieceSupprimee).setSupprimee(true);
-					(getCase(coup.getPositionCaseFinale())).setFinale(true);
+					(getCase(coup.getPositionFinale())).setFinale(true);
 				}
 			}
 		}
@@ -325,15 +350,15 @@ public class Damier extends Plateau {
 
 	public boolean isCoupValide(final Coup coup){
 		for(Coup coupPossible : coupsPossibles){
-			if( (coupPossible.getPositionPieceDeplacee() == coup.getPositionPieceDeplacee()) && (coupPossible.getPositionCaseFinale() == coup.getPositionCaseFinale()) )
+			if( (coupPossible.getPositionInitiale() == coup.getPositionInitiale()) && (coupPossible.getPositionFinale() == coup.getPositionFinale()) )
 				return true;
 		}
 		return false;
 	}
 
 	public void executionCoup(final Coup coup){
-		int source = coup.getPositionPieceDeplacee();
-		int destination = coup.getPositionCaseFinale();
+		int source = coup.getPositionInitiale();
+		int destination = coup.getPositionFinale();
 		
 		deplacerPiece(source,destination);
 		for(int positionsPiecesSupprimees : coup.getPositionsPiecesSupprimees())

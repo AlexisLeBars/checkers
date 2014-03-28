@@ -18,7 +18,7 @@ public class ListenerCase extends MouseAdapter{
 
 		if(case1.isFinale()){
 			Coup coup = ((Damier) this.plateau).getCoupEnCours();
-			coup.setPositionCaseFinale(case1.getPosition());
+			coup.setPositionFinale(case1.getPosition());
 			if( ((Damier) this.plateau).isCoupValide(coup) ){
 				((Damier) this.plateau).executionCoup(coup);
 				((Damier) this.plateau).setCoupEnCours(null);

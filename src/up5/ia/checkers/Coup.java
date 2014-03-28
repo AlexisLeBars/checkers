@@ -4,14 +4,14 @@ import java.util.ArrayList;
 
 public class Coup implements Cloneable{
 
-	private int positionPieceDeplacee;
+	private int positionInitiale;
 	private ArrayList<Integer> positionsPiecesSupprimees;
-	private int positionCaseFinale;
+	private int positionFinale;
 
-	Coup(final int positionPieceDeplacee){
-		this.positionPieceDeplacee=positionPieceDeplacee;
+	Coup(final int positionInitiale){
+		this.positionInitiale=positionInitiale;
 		this.positionsPiecesSupprimees=new ArrayList<Integer>();
-		this.positionCaseFinale=0;
+		this.positionFinale=0;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -26,23 +26,23 @@ public class Coup implements Cloneable{
 		this.positionsPiecesSupprimees = positionsPiecesSupprimees;
 	}
 	
-	public void setPositionCaseFinale(final Integer positionCaseFinale){
-		this.positionCaseFinale = positionCaseFinale;
+	public void setPositionFinale(final Integer positionFinale){
+		this.positionFinale = positionFinale;
 	}
 	
 	public ArrayList<Integer> getPositionsPiecesSupprimees(){
 		return this.positionsPiecesSupprimees;
 	}
 	
-	public int getPositionCaseFinale(){
-		return this.positionCaseFinale;
+	public int getPositionFinale(){
+		return this.positionFinale;
 	}
 
-	public int getPositionPieceDeplacee(){
-		return this.positionPieceDeplacee;
+	public int getPositionInitiale(){
+		return this.positionInitiale;
 	}
 
-	public void addPositionPieceSupprimee(final int positionPiece) {
-		positionsPiecesSupprimees.add(positionPiece);
+	public void addPositionPieceSupprimee(final int position) {
+		positionsPiecesSupprimees.add(position);
 	}
 }

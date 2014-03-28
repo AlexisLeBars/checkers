@@ -22,6 +22,10 @@ public abstract class Piece extends JPanel{
 	public int getPosition(){
 		return this.position;
 	}
+	
+	public void setPosition(int position){
+		this.position = position;
+	}
 
 	public void setSupprimee(final boolean supprimee){
 		this.supprimee=supprimee;

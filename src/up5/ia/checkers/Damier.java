@@ -23,13 +23,13 @@ public class Damier extends Plateau {
 	public static final Point DIAG_BD = new Point(1,1);
 	
 	private final String priseRegex = "(^"+PION_BLANC+"["+PION_NOIR+""+DAME_NOIR+"]"+VIDE+")|(^"+PION_NOIR+"["+PION_BLANC+""+DAME_BLANC+"]"+VIDE+")|(^"+DAME_BLANC+""+VIDE+"*["+PION_NOIR+""+DAME_NOIR+"]"+VIDE+")|(^"+DAME_NOIR+""+VIDE+"*["+PION_BLANC+""+DAME_BLANC+"]"+VIDE+")";
-	private final String deplacementRegex = "^[1-4][^0]^["+PION_BLANC+"-"+DAME_NOIR+"][^"+VIDE+"]";
+	private final String deplacementRegex = "^["+PION_BLANC+"-"+DAME_NOIR+"][^"+VIDE+"]^["+PION_BLANC+"-"+DAME_NOIR+"][^"+VIDE+"]";
 
 	private ArrayList<Piece> piecesBlancs;
 	private ArrayList<Piece> piecesNoirs;
 
 	private ArrayList<Coup> coupsPossibles;
-	private Coup coupEnCours;
+	private int positionPieceActive;
 
 	private Couleur traitAux;
 
@@ -42,7 +42,7 @@ public class Damier extends Plateau {
 		piecesBlancs = new ArrayList<Piece>();
 		piecesNoirs = new ArrayList<Piece>();
 		coupsPossibles = new ArrayList<Coup>();
-		coupEnCours = null;
+		positionPieceActive = 0;
 		disposerPions();
 	}
 
@@ -68,8 +68,8 @@ public class Damier extends Plateau {
 		this.coupsPossibles = coupsPossibles;
 	}
 
-	public void setCoupEnCours(final Coup coup){
-		this.coupEnCours=coup;
+	public void setPositionPieceActive(final int positionPieceActive){
+		this.positionPieceActive=positionPieceActive;
 	}
 
 	public Case getCase(final int position){
@@ -84,8 +84,8 @@ public class Damier extends Plateau {
 		return this.traitAux;
 	}
 
-	public Coup getCoupEnCours(){
-		return this.coupEnCours;
+	public int getPositionPieceActive(){
+		return this.positionPieceActive;
 	}
 
 	private void creerPion(int[][] damier, final Couleur couleur, final int position){
@@ -348,12 +348,12 @@ public class Damier extends Plateau {
 		}
 	}
 
-	public boolean isCoupValide(final Coup coup){
+	public Coup getCoupValide(final int positionInitiale, final  int positionFinale){
 		for(Coup coupPossible : coupsPossibles){
-			if( (coupPossible.getPositionInitiale() == coup.getPositionInitiale()) && (coupPossible.getPositionFinale() == coup.getPositionFinale()) )
-				return true;
+			if( (coupPossible.getPositionInitiale() == positionInitiale) && (coupPossible.getPositionFinale() == positionFinale) )
+				return coupPossible;
 		}
-		return false;
+		return null;
 	}
 
 	public void executionCoup(final Coup coup){
@@ -377,6 +377,7 @@ public class Damier extends Plateau {
 		reinitEtatCases();
 		reinitEtatPieces(traitAux);
 	
+		this.setPositionPieceActive(0);
 		traitAux = (traitAux==Couleur.BLANC)?Couleur.NOIR:Couleur.BLANC;
 		calculerCoupsPossibles(traitAux);
 	}

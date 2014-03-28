@@ -26,7 +26,7 @@ public class Dame extends Piece {
 		}
 	}
 	
-	// A modifier pour que la dame ne ressemble pas à un pion
+	// TODO A modifier pour que la dame ne ressemble pas à un pion
 	@Override
 	public void paintComponent(Graphics g){
 		Paint paint;

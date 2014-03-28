@@ -25,7 +25,7 @@ public class Pion extends Piece {
 				break;
 		}
 	}
-	
+
 	@Override
 	public void paintComponent(Graphics g){
 		Paint paint;

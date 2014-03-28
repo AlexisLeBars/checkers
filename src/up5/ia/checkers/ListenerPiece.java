@@ -15,8 +15,7 @@ public class ListenerPiece extends MouseAdapter {
 	}
 
 	public void mousePressed(MouseEvent arg0) {
-		System.out.println(piece.getPosition());
-		damier.setCoupEnCours( new Coup(piece.getPosition()) );
+		damier.setPositionPieceActive( piece.getPosition() );
 		damier.afficherCoups(piece);
 	}
 

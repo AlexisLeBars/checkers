@@ -29,7 +29,7 @@ public abstract class Piece extends JPanel{
 
 	public void setSupprimee(final boolean supprimee){
 		this.supprimee=supprimee;
-		// TO DO
+		// TODO
 		// modification de l'apparence d'une piece
 	}
 

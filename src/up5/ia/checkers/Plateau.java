@@ -25,7 +25,8 @@ public class Plateau extends JPanel {
 
 	private void ajouterCase(final Couleur couleur, final int position){
 		Case case1 = new Case(couleur,position);
-		case1.addMouseListener(new ListenerCase(case1, this));
+		if(couleur == Couleur.NOIR)
+			case1.addMouseListener(new ListenerCase(case1, this));
 		add(case1);
 	}
 

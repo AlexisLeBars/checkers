@@ -215,27 +215,79 @@ public class Damier extends Plateau {
 		destinationCase.repaint();
 	}
 	
+	public int getPositionSuivante(final int position, final Point direction){
+		if(positionToCoordonnees(position).getX()%2 == 0){
+			if(direction == DIAG_HG)
+				return position-5;
+			else if(direction == DIAG_HD)
+				return position-4;
+			else if(direction == DIAG_BD)
+				return position+6;
+			else
+				return position+5;
+		}
+		else{
+			if(direction == DIAG_HG)
+				return position-6;
+			else if(direction == DIAG_HD)
+				return position-5;
+			else if(direction == DIAG_BD)
+				return position+5;
+			else
+				return position+4;
+		}
+	}
+	
 	private ArrayList<Integer> positionsPossibles(final int[][] damier,final int position, final Point direction, final String regex){
 		Point coordonnees = positionToCoordonnees(position);
 		int ligne = (int) coordonnees.getX();
 		int colonne = (int) coordonnees.getY();
-		
+
 		int directionLigne = (int) direction.getX();
 		int directionColonne = (int) direction.getY();
-		
+
 		StringBuilder diagonale = new StringBuilder( String.valueOf(damier[ligne][colonne]) );
 		try{
-			for(int i=1;true;i++){
+			for(int i=1;true;i++)
 				diagonale.append(damier[ligne+i*directionLigne][colonne+i*directionColonne]);
-			}
 		}
 		catch(Exception e){
 		}
-// TODO
+
+		ArrayList<Integer> positionsPossibles=new ArrayList<Integer>();
+		ArrayList<Integer> positions=new ArrayList<Integer>();
+
 		if( Pattern.matches(regex, diagonale) ){
-			
+			int positionPrecedente = position;
+			for(int i=0;i<diagonale.length()-1;i++){
+				positionPrecedente = getPositionSuivante(positionPrecedente, direction);
+				positions.add(positionPrecedente);
+			}
+			int i = 1;
+			if(regex == priseRegex){
+				//mange
+				while( diagonale.charAt(i) == '0')
+					i++;
+				i++;
+				positionsPossibles.add(positions.get(i));
+				if( diagonale.charAt(0) == DAME_BLANC ||  diagonale.charAt(0) == DAME_NOIR){
+					while(diagonale.charAt(i) == '0')
+						positionsPossibles.add(positions.get(i));
+				}
+			}
+			else{
+				//déplacement simple
+				positionsPossibles.add(positions.get(1));
+				if( diagonale.charAt(0) == DAME_BLANC ||  diagonale.charAt(0) == DAME_NOIR){
+					i=2;
+					while(diagonale.charAt(i) == '0'){
+						positionsPossibles.add(positions.get(i));
+						i++;
+					}
+				}
+			}
 		}
-		return new ArrayList<Integer>();
+		return positionsPossibles;
 	}
 
 // A COMPLETER
@@ -311,7 +363,7 @@ public class Damier extends Plateau {
 	}
 
 	public void supprimerCoupsInterdits(ArrayList<Coup> coups){
-		// TO DO
+		// TODO
 	}
 
 	public void afficherCoups(final Piece piece){

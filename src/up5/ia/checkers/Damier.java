@@ -215,7 +215,7 @@ public class Damier extends Plateau {
 		destinationCase.repaint();
 	}
 	
-	public int getPositionSuivante(final int position, final Point direction){
+	public int positionSuivante(final int position, final Point direction){
 		if(positionToCoordonnees(position).getX()%2 == 0){
 			if(direction == DIAG_HG)
 				return position-5;
@@ -260,7 +260,7 @@ public class Damier extends Plateau {
 		if( Pattern.matches(regex, diagonale) ){
 			int positionPrecedente = position;
 			for(int i=0;i<diagonale.length()-1;i++){
-				positionPrecedente = getPositionSuivante(positionPrecedente, direction);
+				positionPrecedente = positionSuivante(positionPrecedente, direction);
 				positions.add(positionPrecedente);
 			}
 			int i = 1;
@@ -290,7 +290,6 @@ public class Damier extends Plateau {
 		return positionsPossibles;
 	}
 
-// A COMPLETER
 	private void calculerCoupsPossibles(final int[][] damier, final int position, final Coup coup){
 	// Puis-je prendre ?
 		boolean prisePossible = false;
@@ -298,33 +297,83 @@ public class Damier extends Plateau {
 		prisesPossibles = positionsPossibles(damier,position,DIAG_HG,priseRegex);
 		if( !prisesPossibles.isEmpty() ){
 			prisePossible=true;
-			// pour toutes les prises possibles on rappelle la fonction
+			// pour chaque prise possible, la fonction se rappelle elle même avec de nouveux paramètres
+			for(int destination : prisesPossibles){
+				int[][] cloneDamier = damier.clone();
+				Coup cloneCoup = null;
+				try{
+					cloneCoup = coup.clone();
+				}
+				catch(Exception e){
+				}
+				int positionPiecePrise = positionSuivante(prisesPossibles.get(0),DIAG_BD);
+				coup.addPositionPieceSupprimee(positionPiecePrise);
+				marquerPieceSupprimee(cloneDamier,positionPiecePrise);
+				deplacerPiece(cloneDamier,position,destination);
+				calculerCoupsPossibles(cloneDamier,destination,cloneCoup);
+			}
 		}
 		prisesPossibles = positionsPossibles(damier,position,DIAG_HD,priseRegex);
 		if( !prisesPossibles.isEmpty() ){
 			prisePossible=true;
-			// pour toutes les prises possibles on rappelle la fonction
+			// pour chaque prise possible, la fonction se rappelle elle même avec de nouveux paramètres
+			for(int destination : prisesPossibles){
+				int[][] cloneDamier = damier.clone();
+				Coup cloneCoup = null;
+				try{
+					cloneCoup = coup.clone();
+				}
+				catch(Exception e){
+				}
+				int positionPiecePrise = positionSuivante(prisesPossibles.get(0),DIAG_BG);
+				coup.addPositionPieceSupprimee(positionPiecePrise);
+				marquerPieceSupprimee(cloneDamier,positionPiecePrise);
+				deplacerPiece(cloneDamier,position,destination);
+				calculerCoupsPossibles(cloneDamier,destination,cloneCoup);
+			}
 		}
 		prisesPossibles = positionsPossibles(damier,position,DIAG_BD,priseRegex);
 		if( !prisesPossibles.isEmpty() ){
 			prisePossible=true;
-			// pour toutes les prises possibles on rappelle la fonction
+			// pour chaque prise possible, la fonction se rappelle elle même avec de nouveux paramètres
+			for(int destination : prisesPossibles){
+				int[][] cloneDamier = damier.clone();
+				Coup cloneCoup = null;
+				try{
+					cloneCoup = coup.clone();
+				}
+				catch(Exception e){
+				}
+				int positionPiecePrise = positionSuivante(prisesPossibles.get(0),DIAG_HG);
+				coup.addPositionPieceSupprimee(positionPiecePrise);
+				marquerPieceSupprimee(cloneDamier,positionPiecePrise);
+				deplacerPiece(cloneDamier,position,destination);
+				calculerCoupsPossibles(cloneDamier,destination,cloneCoup);
+			}
 		}
 		prisesPossibles = positionsPossibles(damier,position,DIAG_BG,priseRegex);
 		if( !prisesPossibles.isEmpty() ){
 			prisePossible=true;
-			// pour toutes les prises possibles on rappelle la fonction
+			// pour chaque prise possible, la fonction se rappelle elle même avec de nouveux paramètres
+			for(int destination : prisesPossibles){
+				int[][] cloneDamier = damier.clone();
+				Coup cloneCoup = null;
+				try{
+					cloneCoup = coup.clone();
+				}
+				catch(Exception e){
+				}
+				int positionPiecePrise = positionSuivante(prisesPossibles.get(0),DIAG_HD);
+				coup.addPositionPieceSupprimee(positionPiecePrise);
+				marquerPieceSupprimee(cloneDamier,positionPiecePrise);
+				deplacerPiece(cloneDamier,position,destination);
+				calculerCoupsPossibles(cloneDamier,destination,cloneCoup);
+			}
 		}
 	// je ne peux pas prendre, et je me suis déjà déplacé
 		if( !prisePossible && (coup.getPositionFinale() != 0 || !coup.getPositionsPiecesSupprimees().isEmpty()) ){
-			Coup clone = null;
-			try{
-				clone = (Coup) coup.clone();
-			}
-			catch(Exception e){
-			}
-			clone.setPositionFinale(position);
-			this.coupsPossibles.add(clone);
+			coup.setPositionFinale(position);
+			this.coupsPossibles.add(coup);
 		}
 	// je ne peux pas prendre, et je ne me suis pas déjà déplacé, puis-je me déplacer ?
 		else if( !prisePossible ){
@@ -335,20 +384,68 @@ public class Damier extends Plateau {
 				deplacementsPossibles = positionsPossibles(damier,position,DIAG_HG,deplacementRegex);
 				if( !deplacementsPossibles.isEmpty() ){
 					// pour tous les déplacements possibles, j'ajoute un coup dans les coupsPossibles
+					for(int destination : deplacementsPossibles){
+						int[][] cloneDamier = damier.clone();
+						Coup cloneCoup = null;
+						try{
+							cloneCoup = coup.clone();
+						}
+						catch(Exception e){
+						}
+						deplacerPiece(cloneDamier,position,destination);
+						cloneCoup.setPositionFinale(destination);
+						this.coupsPossibles.add(cloneCoup);
+					}
 				}
 				deplacementsPossibles = positionsPossibles(damier,position,DIAG_HD,deplacementRegex);
 				if( !deplacementsPossibles.isEmpty() ){
 					// pour tous les déplacements possibles, j'ajoute un coup dans les coupsPossibles
+					for(int destination : deplacementsPossibles){
+						int[][] cloneDamier = damier.clone();
+						Coup cloneCoup = null;
+						try{
+							cloneCoup = coup.clone();
+						}
+						catch(Exception e){
+						}
+						deplacerPiece(cloneDamier,position,destination);
+						cloneCoup.setPositionFinale(destination);
+						this.coupsPossibles.add(cloneCoup);
+					}
 				}
 			}
 			else if(piece == PION_NOIR || piece==DAME_NOIR){
 				deplacementsPossibles = positionsPossibles(damier,position,DIAG_BD,deplacementRegex);
 				if( !deplacementsPossibles.isEmpty() ){
 					// pour tous les déplacements possibles, j'ajoute un coup dans les coupsPossibles
+					for(int destination : deplacementsPossibles){
+						int[][] cloneDamier = damier.clone();
+						Coup cloneCoup = null;
+						try{
+							cloneCoup = coup.clone();
+						}
+						catch(Exception e){
+						}
+						deplacerPiece(cloneDamier,position,destination);
+						cloneCoup.setPositionFinale(destination);
+						this.coupsPossibles.add(cloneCoup);
+					}
 				}
 				deplacementsPossibles = positionsPossibles(damier,position,DIAG_BG,deplacementRegex);
 				if( !deplacementsPossibles.isEmpty() ){
 					// pour tous les déplacements possibles, j'ajoute un coup dans les coupsPossibles
+					for(int destination : deplacementsPossibles){
+						int[][] cloneDamier = damier.clone();
+						Coup cloneCoup = null;
+						try{
+							cloneCoup = coup.clone();
+						}
+						catch(Exception e){
+						}
+						deplacerPiece(cloneDamier,position,destination);
+						cloneCoup.setPositionFinale(destination);
+						this.coupsPossibles.add(cloneCoup);
+					}
 				}
 			}	
 			// je ne peux pas prendre, je ne me suis pas déjà déplacé, je ne peux pas me déplacer -> aucun coup possible
@@ -363,7 +460,21 @@ public class Damier extends Plateau {
 	}
 
 	public void supprimerCoupsInterdits(ArrayList<Coup> coups){
-		// TODO
+	    int max=0;
+	    int nbPiecesPrises=0;
+	    
+	    for(Coup coup : coups){
+	        nbPiecesPrises = coup.getPositionsPiecesSupprimees().size();
+	        if(max<nbPiecesPrises)
+	            max = nbPiecesPrises;
+	    }
+	    
+	    int i=0;
+	    for(Coup coup : coups){
+	        if(coup.getPositionsPiecesSupprimees().size() < max)
+	            coups.remove(i);
+	        i++;
+	    }
 	}
 
 	public void afficherCoups(final Piece piece){

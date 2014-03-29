@@ -1,7 +1,5 @@
 package up5.ia.checkers;
 
-import java.util.ArrayList;
-
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 
@@ -18,9 +16,11 @@ public class Lanceur {
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Damier damier = new Damier();
 		// Commenté car pas encore implémenté
-		//damier.setCoupsPossibles(damier.calculerCoupsPossibles(Couleur.BLANC));
+		damier.calculerCoupsPossibles(Couleur.BLANC);
 		
+	/*
 	//lignes de test
+	
 		Coup coup1 = new Coup(31);
 		coup1.setPositionFinale(26);
 		Coup coup2 = new Coup(31);
@@ -32,6 +32,7 @@ public class Lanceur {
 		
 		damier.setCoupsPossibles(coupsPossibles);
 	// lignes de test
+	 */
 		
 		f.add(damier);
 		f.setVisible(true);

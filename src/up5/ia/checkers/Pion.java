@@ -5,6 +5,7 @@ import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.RenderingHints;
 
 public class Pion extends Piece {
 
@@ -37,9 +38,20 @@ public class Pion extends Piece {
 			System.out.println("Error");
 			return;
 		}
-		paint = new GradientPaint(0,0, getBackground(), getWidth(), getHeight(), getForeground());
-		g2d.setPaint(paint);
-		g.fillOval(5, 5, getWidth()-10, getHeight()-10);
+		RenderingHints qualityHints=new RenderingHints(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+		qualityHints.put(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+		g2d.setRenderingHints(qualityHints);
+		
+		if(this.supprimee){
+			paint = new GradientPaint(0,0, this.couleur==Couleur.NOIR?Color.RED:Color.WHITE, getWidth(), getHeight(), this.couleur==Couleur.NOIR?Color.DARK_GRAY:Color.RED);
+			g2d.setPaint(paint);
+			g.fillOval(5, 5, getWidth()-10, getHeight()-10);
+		}
+		else{
+			paint = new GradientPaint(0,0, getBackground(), getWidth(), getHeight(), getForeground());
+			g2d.setPaint(paint);
+			g.fillOval(5, 5, getWidth()-10, getHeight()-10);
+		}
 	}
 
 }

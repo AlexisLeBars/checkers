@@ -1,10 +1,10 @@
 package up5.ia.checkers;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridLayout;
 import java.awt.Paint;
 
 import javax.swing.JPanel;
@@ -19,8 +19,8 @@ public class Case extends JPanel implements Cloneable{
 	private boolean finale;
 
 	public Case(final Couleur couleur,final int position){
+		super(new BorderLayout());
 		this.position = position;
-		setLayout(new GridLayout(1,1));
 		this.couleur=couleur;
 		initCouleur();
 	}

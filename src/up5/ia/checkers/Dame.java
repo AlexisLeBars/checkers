@@ -5,6 +5,7 @@ import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.RenderingHints;
 
 public class Dame extends Piece {
 
@@ -25,8 +26,7 @@ public class Dame extends Piece {
 				break;
 		}
 	}
-	
-	// TODO A modifier pour que la dame ne ressemble pas à un pion
+
 	@Override
 	public void paintComponent(Graphics g){
 		Paint paint;
@@ -38,8 +38,33 @@ public class Dame extends Piece {
 			System.out.println("Error");
 			return;
 		}
-		paint = new GradientPaint(0,0, getBackground(), getWidth(), getHeight(), getForeground());
-		g2d.setPaint(paint);
-		g.fillOval(5, 5, getWidth()-10, getHeight()-10);
+		RenderingHints qualityHints=new RenderingHints(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+		qualityHints.put(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+		g2d.setRenderingHints(qualityHints);
+
+		if(this.supprimee){
+			paint = new GradientPaint(0,0, this.couleur==Couleur.NOIR?Color.RED:Color.WHITE, getWidth(), getHeight(), this.couleur==Couleur.NOIR?Color.DARK_GRAY:Color.RED);
+			g2d.setPaint(paint);
+			g.fillOval(5, 5, getWidth()-10, getHeight()-10);
+		}else{
+			paint = new GradientPaint(0,0, getBackground(), getWidth(), getHeight(), getForeground());
+			g2d.setPaint(paint);
+			g.fillOval(5, 5, getWidth()-10, getHeight()-10);
+		}
+		
+		Paint paint2=null;
+		if(couleur==Couleur.BLANC){
+			g.setColor(Color.BLACK);
+			paint2 = new GradientPaint(20,20, Color.GRAY, getWidth()-40, getHeight()-40, Color.BLACK);
+		}
+		else{
+			g.setColor(Color.BLACK);
+			paint2 = new GradientPaint(20,20, Color.WHITE, getWidth()-40, getHeight()-40, Color.GRAY);
+		}
+		
+
+		g2d.setPaint(paint2);
+		g.fillOval(20, 20, getWidth()-40, getHeight()-40);
 	}
+	
 }

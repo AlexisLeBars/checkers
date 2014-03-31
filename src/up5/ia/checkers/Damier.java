@@ -109,6 +109,9 @@ public class Damier extends Plateau {
 		pion.addMouseListener(new ListenerPiece(pion, this));
 		Case case1 = getCase(position);
 		case1.add(pion);
+		case1.validate();
+		case1.repaint();
+
 		switch(couleur){
 			case BLANC :
 				piecesBlancs.add(pion);
@@ -139,13 +142,16 @@ public class Damier extends Plateau {
 		dame.addMouseListener(new ListenerPiece(dame, this));
 		Case case1 = getCase(position);
 		case1.add(dame);
+		case1.validate();
+		case1.repaint();
+
 		switch(couleur){
-		case BLANC :
-			piecesBlancs.add(dame);
-			break;
-		case NOIR :
-			piecesNoirs.add(dame);
-			break;
+			case BLANC :
+				piecesBlancs.add(dame);
+				break;
+			case NOIR :
+				piecesNoirs.add(dame);
+				break;
 		}
 		return dame;
 	}
@@ -263,18 +269,20 @@ public class Damier extends Plateau {
 					i++;
 				i++;
 				positionsPossibles.add(positions.get(i-1));
-				if( diagonale.charAt(0) == DAME_BLANC ||  diagonale.charAt(0) == DAME_NOIR){
-					while(diagonale.charAt(i) == '0')
+				if( damier[ligne][colonne] == DAME_BLANC ||  damier[ligne][colonne] == DAME_NOIR){
+					while(i<diagonale.length() && diagonale.charAt(i) == '0' ){
 						positionsPossibles.add(positions.get(i-1));
+						i++;
+					}
 				}
 			}
 			else{
 				//déplacement simple
 				positionsPossibles.add(positions.get(0));
-				if( diagonale.charAt(0) == DAME_BLANC ||  diagonale.charAt(0) == DAME_NOIR){
+				if( damier[ligne][colonne] == DAME_BLANC ||  damier[ligne][colonne] == DAME_NOIR){
 					i=2;
-					while(diagonale.charAt(i) == '0'){
-						positionsPossibles.add(positions.get(i));
+					while(i<diagonale.length() && diagonale.charAt(i) == '0' ){
+						positionsPossibles.add(positions.get(i-1));
 						i++;
 					}
 				}
@@ -381,7 +389,7 @@ public class Damier extends Plateau {
 			ArrayList<Integer> deplacementsPossibles = null;
 			Point coordonnees = positionToCoordonnees(position);
 			int piece = damier[(int) coordonnees.getX()][(int) coordonnees.getY()];
-			if(piece == PION_BLANC || piece==DAME_BLANC){
+			if(piece == PION_BLANC){
 				deplacementsPossibles = positionsPossibles(damier,position,DIAG_HG,deplacementPattern);
 				if( !deplacementsPossibles.isEmpty() ){
 					// pour tous les déplacements possibles, j'ajoute un coup dans les coupsPossibles
@@ -419,7 +427,7 @@ public class Damier extends Plateau {
 					}
 				}
 			}
-			else if(piece == PION_NOIR || piece==DAME_NOIR){
+			else if(piece == PION_NOIR){
 				deplacementsPossibles = positionsPossibles(damier,position,DIAG_BD,deplacementPattern);
 				if( !deplacementsPossibles.isEmpty() ){
 					// pour tous les déplacements possibles, j'ajoute un coup dans les coupsPossibles
@@ -456,7 +464,81 @@ public class Damier extends Plateau {
 						this.coupsPossibles.add(cloneCoup);
 					}
 				}
-			}	
+			}
+			else if(piece == DAME_BLANC || piece == DAME_NOIR){
+				deplacementsPossibles = positionsPossibles(damier,position,DIAG_HG,deplacementPattern);
+				if( !deplacementsPossibles.isEmpty() ){
+					// pour tous les déplacements possibles, j'ajoute un coup dans les coupsPossibles
+					for(int destination : deplacementsPossibles){
+						int[][] cloneDamier = damier.clone();
+						for(int i=0; i<cloneDamier.length; i++)
+							cloneDamier[i] = cloneDamier[i].clone();
+						Coup cloneCoup = null;
+						try{
+							cloneCoup = coup.clone();
+						}
+						catch(Exception e){
+						}
+						deplacerPiece(cloneDamier,position,destination);
+						cloneCoup.setPositionFinale(destination);
+						this.coupsPossibles.add(cloneCoup);
+					}
+				}
+				deplacementsPossibles = positionsPossibles(damier,position,DIAG_HD,deplacementPattern);
+				if( !deplacementsPossibles.isEmpty() ){
+					// pour tous les déplacements possibles, j'ajoute un coup dans les coupsPossibles
+					for(int destination : deplacementsPossibles){
+						int[][] cloneDamier = damier.clone();
+						for(int i=0; i<cloneDamier.length; i++)
+							cloneDamier[i] = cloneDamier[i].clone();
+						Coup cloneCoup = null;
+						try{
+							cloneCoup = coup.clone();
+						}
+						catch(Exception e){
+						}
+						deplacerPiece(cloneDamier,position,destination);
+						cloneCoup.setPositionFinale(destination);
+						this.coupsPossibles.add(cloneCoup);
+					}
+				}
+				deplacementsPossibles = positionsPossibles(damier,position,DIAG_BD,deplacementPattern);
+				if( !deplacementsPossibles.isEmpty() ){
+					// pour tous les déplacements possibles, j'ajoute un coup dans les coupsPossibles
+					for(int destination : deplacementsPossibles){
+						int[][] cloneDamier = damier.clone();
+						for(int i=0; i<cloneDamier.length; i++)
+							cloneDamier[i] = cloneDamier[i].clone();
+						Coup cloneCoup = null;
+						try{
+							cloneCoup = coup.clone();
+						}
+						catch(Exception e){
+						}
+						deplacerPiece(cloneDamier,position,destination);
+						cloneCoup.setPositionFinale(destination);
+						this.coupsPossibles.add(cloneCoup);
+					}
+				}
+				deplacementsPossibles = positionsPossibles(damier,position,DIAG_BG,deplacementPattern);
+				if( !deplacementsPossibles.isEmpty() ){
+					// pour tous les déplacements possibles, j'ajoute un coup dans les coupsPossibles
+					for(int destination : deplacementsPossibles){
+						int[][] cloneDamier = damier.clone();
+						for(int i=0; i<cloneDamier.length; i++)
+							cloneDamier[i] = cloneDamier[i].clone();
+						Coup cloneCoup = null;
+						try{
+							cloneCoup = coup.clone();
+						}
+						catch(Exception e){
+						}
+						deplacerPiece(cloneDamier,position,destination);
+						cloneCoup.setPositionFinale(destination);
+						this.coupsPossibles.add(cloneCoup);
+					}
+				}
+			}
 			// je ne peux pas prendre, je ne me suis pas déjà déplacé, je ne peux pas me déplacer -> aucun coup possible
 		}
 	}
@@ -490,7 +572,7 @@ public class Damier extends Plateau {
 	public void afficherCoups(final Piece piece){
 	
 		reinitEtatCases();
-		reinitEtatPieces(piece.getCouleur());
+		reinitEtatPieces( (piece.getCouleur()==Couleur.BLANC)?Couleur.NOIR:Couleur.BLANC);
 	
 		if(piece.getCouleur() == traitAux){
 			for(Coup coup : coupsPossibles){
@@ -547,11 +629,10 @@ public class Damier extends Plateau {
 			creerDame(traitAux,destination);
 		}
 	
-		reinitEtatCases();
-		reinitEtatPieces(traitAux);
-	
 		this.setPositionPieceActive(0);
+		reinitEtatCases();
 		traitAux = (traitAux==Couleur.BLANC)?Couleur.NOIR:Couleur.BLANC;
+		reinitEtatPieces(traitAux);
 		coupsPossibles.clear();
 		calculerCoupsPossibles(traitAux);
 	}

@@ -1,5 +1,8 @@
 package up5.ia.checkers;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 
@@ -11,30 +14,17 @@ public class Lanceur {
 		}
 		catch(Exception e){}
 		JFrame f = new JFrame();
-		f.setSize(600, 600);
+		f.setLayout(new BorderLayout());
+		f.setTitle("Jeu De Dames");
+		f.setMinimumSize(new Dimension(600,600));
 		f.setLocationRelativeTo(null);
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
 		Damier damier = new Damier();
-		// Commenté car pas encore implémenté
+		
 		damier.calculerCoupsPossibles(Couleur.BLANC);
-		
-	/*
-	//lignes de test
-	
-		Coup coup1 = new Coup(31);
-		coup1.setPositionFinale(26);
-		Coup coup2 = new Coup(31);
-		coup2.setPositionFinale(27);
-	
-		ArrayList<Coup> coupsPossibles = new ArrayList<Coup>();
-		coupsPossibles.add(coup1);
-		coupsPossibles.add(coup2);
-		
-		damier.setCoupsPossibles(coupsPossibles);
-	// lignes de test
-	 */
-		
-		f.add(damier);
+		f.add(damier,BorderLayout.CENTER);
 		f.setVisible(true);
+		f.pack();
 	}
 }

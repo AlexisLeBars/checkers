@@ -22,7 +22,7 @@ public class ListenerCase extends MouseAdapter{
 		}
 		else{
 			((Damier) this.plateau).reinitEtatCases();
-			((Damier) this.plateau).reinitEtatPieces(((Damier) this.plateau).getTrait());
+			((Damier) this.plateau).reinitEtatPieces( (((Damier) this.plateau).getTrait()==Couleur.BLANC)?Couleur.NOIR:Couleur.BLANC);
 		}
 		((Damier) this.plateau).setPositionPieceActive(0);
 	}

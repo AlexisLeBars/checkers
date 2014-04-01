@@ -101,7 +101,7 @@ public class Damier extends Plateau {
 		}
 	}
 
-	private Pion creerPion(final Couleur couleur, final int position){
+	public Pion creerPion(final Couleur couleur, final int position){
 		
 		creerPion(damier, couleur, position);
 		
@@ -188,30 +188,33 @@ public class Damier extends Plateau {
 	}
 
 	private void deplacerPiece(int[][] damier, final int source,final int destination){
-		int sourceX = (int) positionToCoordonnees(source).getX();
-		int sourceY = (int) positionToCoordonnees(source).getY();
+		if(destination != source){
+			int sourceX = (int) positionToCoordonnees(source).getX();
+			int sourceY = (int) positionToCoordonnees(source).getY();
 
-		int destinationX = (int) positionToCoordonnees(destination).getX();
-		int destinationY = (int) positionToCoordonnees(destination).getY();
-		
-		damier[destinationX][destinationY]=damier[sourceX][sourceY];
-		damier[sourceX][sourceY] = VIDE;
+			int destinationX = (int) positionToCoordonnees(destination).getX();
+			int destinationY = (int) positionToCoordonnees(destination).getY();
+			
+			damier[destinationX][destinationY]=damier[sourceX][sourceY];
+			damier[sourceX][sourceY] = VIDE;
+		}
 	}
 
 	private void deplacerPiece(final int source,final int destination){
-	
-		deplacerPiece(damier, source, destination);
-		
-		Piece piece = getPiece(source);
-		Case provenanceCase = getCase(source);
-		Case destinationCase = getCase(destination);
-		destinationCase.add(piece);
-		piece.setPosition(destination);
-		provenanceCase.removeAll();
-		provenanceCase.validate();
-		provenanceCase.repaint();
-		destinationCase.validate();
-		destinationCase.repaint();
+		if(destination != source){
+			deplacerPiece(damier, source, destination);
+			
+			Piece piece = getPiece(source);
+			Case provenanceCase = getCase(source);
+			Case destinationCase = getCase(destination);
+			destinationCase.add(piece);
+			piece.setPosition(destination);
+			provenanceCase.removeAll();
+			provenanceCase.validate();
+			provenanceCase.repaint();
+			destinationCase.validate();
+			destinationCase.repaint();
+		}
 	}
 	
 	public int positionSuivante(final int position, final Point direction){

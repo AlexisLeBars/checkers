@@ -7,7 +7,9 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
 
 
 public class Case extends JPanel implements Cloneable{
@@ -22,6 +24,8 @@ public class Case extends JPanel implements Cloneable{
 		super(new BorderLayout());
 		this.position = position;
 		this.couleur=couleur;
+		Border border = BorderFactory.createEmptyBorder(10,10,10,10);
+		setBorder(border);
 		initCouleur();
 	}
 

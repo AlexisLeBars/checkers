@@ -280,7 +280,7 @@ public class Damier extends Plateau {
 				}
 			}
 			else{
-				//dÃ©placement simple
+				//déplacement simple
 				positionsPossibles.add(positions.get(0));
 				if( damier[ligne][colonne] == DAME_BLANC ||  damier[ligne][colonne] == DAME_NOIR){
 					i=2;
@@ -301,7 +301,7 @@ public class Damier extends Plateau {
 		prisesPossibles = positionsPossibles(damier,position,DIAG_HG,prisePattern);
 		if( !prisesPossibles.isEmpty() ){
 			prisePossible=true;
-			// pour chaque prise possible, la fonction se rappelle elle mÃªme avec de nouveux paramÃ¨tres
+			// pour chaque prise possible, la fonction se rappelle elle même avec de nouveux paramètres
 			for(int destination : prisesPossibles){
 				int[][] cloneDamier = damier.clone();
 				for(int i=0; i<cloneDamier.length; i++)
@@ -322,7 +322,7 @@ public class Damier extends Plateau {
 		prisesPossibles = positionsPossibles(damier,position,DIAG_HD,prisePattern);
 		if( !prisesPossibles.isEmpty() ){
 			prisePossible=true;
-			// pour chaque prise possible, la fonction se rappelle elle mÃªme avec de nouveux paramÃ¨tres
+			// pour chaque prise possible, la fonction se rappelle elle même avec de nouveux paramètres
 			for(int destination : prisesPossibles){
 				int[][] cloneDamier = damier.clone();
 				for(int i=0; i<cloneDamier.length; i++)
@@ -343,7 +343,7 @@ public class Damier extends Plateau {
 		prisesPossibles = positionsPossibles(damier,position,DIAG_BD,prisePattern);
 		if( !prisesPossibles.isEmpty() ){
 			prisePossible=true;
-			// pour chaque prise possible, la fonction se rappelle elle mÃªme avec de nouveux paramÃ¨tres
+			// pour chaque prise possible, la fonction se rappelle elle même avec de nouveux paramètres
 			for(int destination : prisesPossibles){
 				int[][] cloneDamier = damier.clone();
 				for(int i=0; i<cloneDamier.length; i++)
@@ -364,7 +364,7 @@ public class Damier extends Plateau {
 		prisesPossibles = positionsPossibles(damier,position,DIAG_BG,prisePattern);
 		if( !prisesPossibles.isEmpty() ){
 			prisePossible=true;
-			// pour chaque prise possible, la fonction se rappelle elle mÃªme avec de nouveux paramÃ¨tres
+			// pour chaque prise possible, la fonction se rappelle elle même avec de nouveux paramètres
 			for(int destination : prisesPossibles){
 				int[][] cloneDamier = damier.clone();
 				for(int i=0; i<cloneDamier.length; i++)
@@ -382,12 +382,12 @@ public class Damier extends Plateau {
 				calculerCoupsPossibles(cloneDamier,destination,cloneCoup);
 			}
 		}
-	// je ne peux pas prendre, et je me suis dÃ©jÃ  dÃ©placÃ©
+	// je ne peux pas prendre, et je me suis déjà déplacé
 		if( !prisePossible && (coup.getPositionFinale() != 0 || !coup.getPositionsPiecesSupprimees().isEmpty()) ){
 			coup.setPositionFinale(position);
 			this.coupsPossibles.add(coup);
 		}
-	// je ne peux pas prendre, et je ne me suis pas dÃ©jÃ  dÃ©placÃ©, puis-je me dÃ©placer ?
+	// je ne peux pas prendre, et je ne me suis pas déjà déplacé, puis-je me déplacer ?
 		else if( !prisePossible ){
 			ArrayList<Integer> deplacementsPossibles = null;
 			Point coordonnees = positionToCoordonnees(position);
@@ -395,7 +395,7 @@ public class Damier extends Plateau {
 			if(piece == PION_BLANC){
 				deplacementsPossibles = positionsPossibles(damier,position,DIAG_HG,deplacementPattern);
 				if( !deplacementsPossibles.isEmpty() ){
-					// pour tous les dÃ©placements possibles, j'ajoute un coup dans les coupsPossibles
+					// pour tous les déplacements possibles, j'ajoute un coup dans les coupsPossibles
 					for(int destination : deplacementsPossibles){
 						int[][] cloneDamier = damier.clone();
 						for(int i=0; i<cloneDamier.length; i++)
@@ -413,7 +413,7 @@ public class Damier extends Plateau {
 				}
 				deplacementsPossibles = positionsPossibles(damier,position,DIAG_HD,deplacementPattern);
 				if( !deplacementsPossibles.isEmpty() ){
-					// pour tous les dÃ©placements possibles, j'ajoute un coup dans les coupsPossibles
+					// pour tous les déplacements possibles, j'ajoute un coup dans les coupsPossibles
 					for(int destination : deplacementsPossibles){
 						int[][] cloneDamier = damier.clone();
 						for(int i=0; i<cloneDamier.length; i++)
@@ -433,7 +433,7 @@ public class Damier extends Plateau {
 			else if(piece == PION_NOIR){
 				deplacementsPossibles = positionsPossibles(damier,position,DIAG_BD,deplacementPattern);
 				if( !deplacementsPossibles.isEmpty() ){
-					// pour tous les dÃ©placements possibles, j'ajoute un coup dans les coupsPossibles
+					// pour tous les déplacements possibles, j'ajoute un coup dans les coupsPossibles
 					for(int destination : deplacementsPossibles){
 						int[][] cloneDamier = damier.clone();
 						for(int i=0; i<cloneDamier.length; i++)
@@ -451,7 +451,7 @@ public class Damier extends Plateau {
 				}
 				deplacementsPossibles = positionsPossibles(damier,position,DIAG_BG,deplacementPattern);
 				if( !deplacementsPossibles.isEmpty() ){
-					// pour tous les dÃ©placements possibles, j'ajoute un coup dans les coupsPossibles
+					// pour tous les déplacements possibles, j'ajoute un coup dans les coupsPossibles
 					for(int destination : deplacementsPossibles){
 						int[][] cloneDamier = damier.clone();
 						for(int i=0; i<cloneDamier.length; i++)
@@ -471,7 +471,7 @@ public class Damier extends Plateau {
 			else if(piece == DAME_BLANC || piece == DAME_NOIR){
 				deplacementsPossibles = positionsPossibles(damier,position,DIAG_HG,deplacementPattern);
 				if( !deplacementsPossibles.isEmpty() ){
-					// pour tous les dÃ©placements possibles, j'ajoute un coup dans les coupsPossibles
+					// pour tous les déplacements possibles, j'ajoute un coup dans les coupsPossibles
 					for(int destination : deplacementsPossibles){
 						int[][] cloneDamier = damier.clone();
 						for(int i=0; i<cloneDamier.length; i++)
@@ -489,7 +489,7 @@ public class Damier extends Plateau {
 				}
 				deplacementsPossibles = positionsPossibles(damier,position,DIAG_HD,deplacementPattern);
 				if( !deplacementsPossibles.isEmpty() ){
-					// pour tous les dÃ©placements possibles, j'ajoute un coup dans les coupsPossibles
+					// pour tous les déplacements possibles, j'ajoute un coup dans les coupsPossibles
 					for(int destination : deplacementsPossibles){
 						int[][] cloneDamier = damier.clone();
 						for(int i=0; i<cloneDamier.length; i++)
@@ -507,7 +507,7 @@ public class Damier extends Plateau {
 				}
 				deplacementsPossibles = positionsPossibles(damier,position,DIAG_BD,deplacementPattern);
 				if( !deplacementsPossibles.isEmpty() ){
-					// pour tous les dÃ©placements possibles, j'ajoute un coup dans les coupsPossibles
+					// pour tous les déplacements possibles, j'ajoute un coup dans les coupsPossibles
 					for(int destination : deplacementsPossibles){
 						int[][] cloneDamier = damier.clone();
 						for(int i=0; i<cloneDamier.length; i++)
@@ -525,7 +525,7 @@ public class Damier extends Plateau {
 				}
 				deplacementsPossibles = positionsPossibles(damier,position,DIAG_BG,deplacementPattern);
 				if( !deplacementsPossibles.isEmpty() ){
-					// pour tous les dÃ©placements possibles, j'ajoute un coup dans les coupsPossibles
+					// pour tous les déplacements possibles, j'ajoute un coup dans les coupsPossibles
 					for(int destination : deplacementsPossibles){
 						int[][] cloneDamier = damier.clone();
 						for(int i=0; i<cloneDamier.length; i++)
@@ -542,7 +542,7 @@ public class Damier extends Plateau {
 					}
 				}
 			}
-			// je ne peux pas prendre, je ne me suis pas dÃ©jÃ  dÃ©placÃ©, je ne peux pas me dÃ©placer -> aucun coup possible
+			// je ne peux pas prendre, je ne me suis pas déjà déplacé, je ne peux pas me déplacer -> aucun coup possible
 		}
 	}
 
@@ -635,8 +635,19 @@ public class Damier extends Plateau {
 		this.setPositionPieceActive(0);
 		reinitEtatCases();
 		traitAux = (traitAux==Couleur.BLANC)?Couleur.NOIR:Couleur.BLANC;
+		if(traitAux==Couleur.BLANC){
+			Lanceur.tour.setText("Tour : Blanc");
+		}
+		else{
+			Lanceur.tour.setText("Tour : Noir");
+		}
 		reinitEtatPieces(traitAux);
 		coupsPossibles.clear();
 		calculerCoupsPossibles(traitAux);
+		if(coupsPossibles.isEmpty() && traitAux==Couleur.NOIR){
+			Lanceur.fin.setText("Partie finie, vainceur Blanc ! ");
+		}
+		else if(coupsPossibles.isEmpty() && traitAux==Couleur.BLANC)
+			Lanceur.fin.setText("Partie finie, vainceur Noir ! ");
 	}
 }

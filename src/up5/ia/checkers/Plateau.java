@@ -1,10 +1,7 @@
 package up5.ia.checkers;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.GridLayout;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 
 import javax.swing.JPanel;
 
@@ -25,7 +22,7 @@ public class Plateau extends JPanel {
 					ajouterCase(Couleur.NOIR, ++position);
 			}
 		}
-
+/*
 		this.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -36,6 +33,7 @@ public class Plateau extends JPanel {
                 Plateau.this.validate();
             }
         });
+*/
 	}
 
 	private void ajouterCase(final Couleur couleur, final int position){

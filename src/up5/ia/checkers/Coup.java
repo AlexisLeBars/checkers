@@ -34,6 +34,10 @@ public class Coup implements Cloneable{
 		return this.positionsPiecesSupprimees;
 	}
 	
+	public int getNbPiecesSupprimees(){
+		return this.positionsPiecesSupprimees.size();
+	}
+	
 	public int getPositionFinale(){
 		return this.positionFinale;
 	}
@@ -44,5 +48,10 @@ public class Coup implements Cloneable{
 
 	public void addPositionPieceSupprimee(final int position) {
 		positionsPiecesSupprimees.add(position);
+	}
+	
+	@Override
+	public String toString(){
+		return this.positionInitiale+"-"+this.positionFinale;
 	}
 }

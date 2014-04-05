@@ -9,7 +9,6 @@ import java.awt.Paint;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
-import javax.swing.border.Border;
 
 
 public class Case extends JPanel implements Cloneable{
@@ -24,8 +23,7 @@ public class Case extends JPanel implements Cloneable{
 		super(new BorderLayout());
 		this.position = position;
 		this.couleur=couleur;
-		Border border = BorderFactory.createEmptyBorder(10,10,10,10);
-		setBorder(border);
+		setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 		initCouleur();
 	}
 
@@ -65,6 +63,11 @@ public class Case extends JPanel implements Cloneable{
 		paint = new GradientPaint(0,0, getBackground(), getWidth(), getHeight(), getForeground());
 		g2d.setPaint(paint);
 		g.fillRect(0, 0, getWidth(), getHeight());
+		if(position!=0){
+			g.setColor(Color.GRAY);
+			String prefix = (position<10)?"O":"";
+			g.drawString(prefix+position,getWidth()-17,getHeight()-3);
+		}
 	}
 
 	public boolean isFinale(){

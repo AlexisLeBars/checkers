@@ -35,8 +35,8 @@ public class Lanceur {
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		Damier damier = new Damier();
-		
-		damier.calculerCoupsPossibles(Couleur.BLANC);
+		damier.setCoupsPossibles(damier.calculerCoupsPossibles(damier.getDamier(),Couleur.BLANC));
+
 		panel=new JPanel(new BorderLayout());
 		infos=new JPanel(new FlowLayout(150));
 		tour =new JLabel();
@@ -45,16 +45,13 @@ public class Lanceur {
 		modeText.setText("Game Mode: ");
 		mode=new JButton("IA ON");
 		mode.addActionListener(new ActionListener(){
-
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				
 				if(mode.getText()=="IA ON")
 					mode.setText("IA OFF");
 				else
 					mode.setText("IA ON");
 			}
-			
 		});
 		fin=new JLabel("Partie en cours");
 		infos.setBorder(BorderFactory.createTitledBorder("Game Info"));
@@ -64,11 +61,11 @@ public class Lanceur {
 		infos.add(mode);
 		infos.add(new JSeparator());
 		infos.add(fin);
-	
 		panel.add(infos,BorderLayout.NORTH);
 		panel.add(new JSeparator());
 		panel.add(damier,BorderLayout.CENTER);
-		f.setContentPane(panel);
+
+		f.getContentPane().add(panel);
 		f.setVisible(true);
 		f.pack();
 	}

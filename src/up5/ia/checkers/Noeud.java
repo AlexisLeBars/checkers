@@ -45,6 +45,10 @@ public class Noeud {
 		return this.gain;
 	}
 	
+	public Noeud getParent(){
+		return this.parent;
+	}
+	
 	public int[][] getEtat(){
 		return this.etat;
 	}

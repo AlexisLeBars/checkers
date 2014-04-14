@@ -33,6 +33,8 @@ public class Damier extends Plateau {
 	private ArrayList<Coup> coupsPossibles;
 	private int positionPieceActive;
 	private Couleur traitAux;
+	
+	public int niveauIA;
 
 	public Damier(){
 		super(TAILLE);
@@ -45,6 +47,7 @@ public class Damier extends Plateau {
 		coupsPossibles = new ArrayList<Coup>();
 		positionPieceActive = 0;
 		disposerPions();
+		niveauIA=3;
 	}
 
 	public Point positionToCoordonnees(final int position){
@@ -770,10 +773,13 @@ public class Damier extends Plateau {
  				executionCoup(clone,coup);
  				Noeud fils = new Noeud(racine,racine.getProfondeur()+1,clone);
  				racine.addFils(fils);
- 				if(max)
- 					fils.setGain(racine.getGain()+coup.getNbPiecesSupprimees());
- 				else
- 					fils.setGain(racine.getGain()-coup.getNbPiecesSupprimees());
+ 				int evaluation = evaluationCoup(damier,coup);
+ 				if(max){
+ 					fils.setGain(racine.getGain()+evaluation);
+ 				}
+ 				else{
+ 					fils.setGain(racine.getGain()-evaluation);
+ 				}
  				fils.setCoup(coup);
  				Couleur traitAux = (trait==Couleur.BLANC)?Couleur.NOIR:Couleur.BLANC;
  				minMax(fils,traitAux,profondeurMax,!max);
@@ -800,8 +806,43 @@ public class Damier extends Plateau {
  		}
  	}
 	
+	private int evaluationCoup(int[][] damier, Coup coup){
+		int gain = 0;
+		int positionInitiale = coup.getPositionInitiale();
+		int positionFinale = coup.getPositionFinale();
+		ArrayList<Integer> positionsPiecesSupprimees = coup.getPositionsPiecesSupprimees();
+		
+		// Pieces mangees ?
+		for(Integer position : positionsPiecesSupprimees){
+			Point coordonnees = positionToCoordonnees(position);
+			int piece = damier[(int)coordonnees.getX()][(int)coordonnees.getY()];
+			if(piece == DAME_NOIR || piece == DAME_BLANC)
+				gain += 4;
+			else
+				gain +=2;
+		}
+
+		// Creation de Dame ?		
+		if(this.niveauIA>=2){
+			Point coordonnees = positionToCoordonnees(positionInitiale);
+			int piece = damier[(int)coordonnees.getX()][(int)coordonnees.getY()];
+			if(piece == PION_BLANC && positionFinale <= 5)
+					gain+=4;
+			else if(piece == PION_NOIR && positionFinale >= 46)
+					gain+=4;
+		}
+		
+		//Position finale ?
+		if(this.niveauIA>=3){
+			int position = positionFinale%10;
+			if( (position == 5 || position == 6) && positionFinale != 5 && positionFinale != 46)
+				gain +=1;
+		}
+			
+		return gain;
+	}
+	
 	int vi=0;
-	//Noeud racine = new Noeud(null,profondeur,0,damier);
 	private void alphaBeta(Noeud racine, final Couleur trait, final int profondeurMax, boolean max){
 		if(racine.getProfondeur() < profondeurMax){
 			int[][] damier = racine.getEtat();
@@ -812,14 +853,17 @@ public class Damier extends Plateau {
 					clone[i]=clone[i].clone();//prends beaucoup trop de temps
 				executionCoup(clone,coup);
 				Noeud fils = new Noeud(racine,racine.getProfondeur()+1,clone);
+				int evaluation = evaluationCoup(damier,coup);
 				if(max){
-					fils.setGain(racine.getGain()+coup.getNbPiecesSupprimees());
-					racine.setGain(-300);//valeur neutre
-				}
-				else{
-					fils.setGain(racine.getGain()-coup.getNbPiecesSupprimees());
-					racine.setGain(300);//valeur neutre
-				}		
+                    fils.setGain(-racine.getGain()+evaluationCoup(damier, coup));
+                    if(coupsPossibles.indexOf(coup)==coupsPossibles.size()-1)
+                        racine.setGain(-300);//valeur neutre
+                }
+                else{
+                    fils.setGain(racine.getGain()-evaluationCoup(damier, coup));
+                    if(coupsPossibles.indexOf(coup)==coupsPossibles.size()-1)
+                        racine.setGain(300);//valeur neutre
+                }
 				racine.addFils(fils);
 				fils.setCoup(coup);
 				Couleur traitAux = (trait==Couleur.BLANC)?Couleur.NOIR:Couleur.BLANC;

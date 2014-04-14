@@ -735,12 +735,15 @@ public class Damier extends Plateau {
 	// Si le nouveau joueur est l'IA
 		if(Lanceur.mode.getText()=="IA ON" && this.traitAux == Couleur.NOIR){
 			Noeud racine = new Noeud(null,0,damier);
-			alphaBeta(racine,this.traitAux,5,true);
+			//alphaBeta(racine,this.traitAux,4,true);
 			System.out.println("Voies non parcourures: "+vi);
 			vi=0;
-			int gain = racine.getGain();
+			//int gain = racine.getGain();
+			int gain = AlphaBeta(racine, this.traitAux, 0, 4, true, -3000, 3000);
+			System.out.println("gain final: "+gain);
 			Coup coupIA = null;
 			for(Noeud fils : racine.getFils()){
+				System.out.println("gain: "+fils.getGain());
 				if(fils.getGain() == gain)
 					coupIA = fils.getCoup();
 			}
@@ -921,6 +924,41 @@ public class Damier extends Plateau {
 				racine.setGain(gmin);
 			}
 			*/
+		}
+	}
+	
+	private int AlphaBeta(Noeud racine, final Couleur trait,int prof, final int profondeurMax, boolean max,int alpha,int beta) {
+		int val=0,best=0;
+		int[][] damier = racine.getEtat();
+		ArrayList<Coup> coupsPossibles = calculerCoupsPossibles(damier,trait);
+		if(prof==profondeurMax){
+		       return evaluationCoup(damier, racine.getCoup());
+			 }
+		else{
+			best=-3000;
+			for(Coup coup : coupsPossibles){
+				int[][] clone = damier.clone();
+				for(int i=0;i<clone.length;i++)
+					clone[i]=clone[i].clone();//prends beaucoup trop de temps
+				executionCoup(clone,coup);
+				Noeud fils = new Noeud(racine,racine.getProfondeur()+1,clone);
+				racine.addFils(fils);
+				fils.setCoup(coup);
+				Couleur traitAux = (trait==Couleur.BLANC)?Couleur.NOIR:Couleur.BLANC;
+				val=-AlphaBeta(fils,traitAux,prof+1,profondeurMax,!max,-alpha,-beta);
+				if( val > best){
+	               best = val;
+	               if( best > alpha ){
+	                      alpha = best;
+	                      fils.setGain(alpha);
+	                   if( alpha >= beta){
+	                	   vi++;
+	                       return best;
+	                   }
+	               }
+				}
+			}
+			return best;
 		}
 	}
 }

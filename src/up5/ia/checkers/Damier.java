@@ -700,6 +700,7 @@ public class Damier extends Plateau {
 
 	public void executionCoup(final Coup coup){
 
+// Execution du coup demandé UI
 		int source = coup.getPositionInitiale();
 		int destination = coup.getPositionFinale();
 
@@ -716,48 +717,92 @@ public class Damier extends Plateau {
 			supprimerPiece(destination);
 			creerDame(traitAux,destination);
 		}
-
+// Execution du coup demandé damier[][]
 		executionCoup(this.damier,coup);
 
-
-		this.setPositionPieceActive(0);
+// Réinitialisation des cases et des pièces + vidage coupsPossibles
 		reinitEtatCases();
-		traitAux = (traitAux==Couleur.BLANC)?Couleur.NOIR:Couleur.BLANC;
-		if(traitAux==Couleur.BLANC)
-			Lanceur.tour.setText("Tour : Blanc");
-		else
-			Lanceur.tour.setText("Tour : Noir");
 		reinitEtatPieces(traitAux);
 		coupsPossibles.clear();
-		if(Lanceur.mode.getText()=="IA ON"){
-			// test de parcourProfondeur
-			if(this.traitAux == Couleur.NOIR){
-				Noeud racine = new Noeud(null,0,damier);
-				minMax(racine,this.traitAux,5,true);
-				System.out.println("Voies non parcourures: "+vi);
-				vi=0;
-				int gain = racine.getGain();
-				Coup coupIA = null;
-				for(Noeud fils : racine.getFils()){
-					if(fils.getGain() == gain){
-						coupIA = fils.getCoup();
-					}
-				}
-				executionCoup(coupIA);
+		
+// Changement de joueur
+		traitAux = (traitAux==Couleur.BLANC)?Couleur.NOIR:Couleur.BLANC;
+		Lanceur.tour.setText(traitAux==Couleur.BLANC?"Tour : Blanc":"Tour : Noir");
+	
+	// Si le nouveau joueur est l'IA
+		if(Lanceur.mode.getText()=="IA ON" && this.traitAux == Couleur.NOIR){
+			Noeud racine = new Noeud(null,0,damier);
+			alphaBeta(racine,this.traitAux,5,true);
+			System.out.println("Voies non parcourures: "+vi);
+			vi=0;
+			int gain = racine.getGain();
+			Coup coupIA = null;
+			for(Noeud fils : racine.getFils()){
+				if(fils.getGain() == gain)
+					coupIA = fils.getCoup();
 			}
+			if(coupIA != null)
+				executionCoup(coupIA);
 			else
-				coupsPossibles = calculerCoupsPossibles(damier,traitAux);
+				Lanceur.fin.setText("Partie finie, vainceur Blanc ! ");
 		}
-		coupsPossibles = calculerCoupsPossibles(damier,traitAux);
+	// Si le nouveau joueur est humain
 
+		// Calcul des coupsPossibles pour le nouveau joueur
+		coupsPossibles = calculerCoupsPossibles(damier,traitAux);
+		
+		// Si pas de coupsPossibles pour le nouveau joueur, fin de la partie
 		if(traitAux==Couleur.NOIR && coupsPossibles.isEmpty())
 			Lanceur.fin.setText("Partie finie, vainceur Blanc ! ");
 		else if(traitAux==Couleur.BLANC && coupsPossibles.isEmpty())
 			Lanceur.fin.setText("Partie finie, vainceur Noir ! ");
 	}
+
+
+	private void minMax(Noeud racine, final Couleur trait, final int profondeurMax, boolean max){
+ 		if(racine.getProfondeur() < profondeurMax){
+ 			int[][] damier = racine.getEtat();
+ 			ArrayList<Coup> coupsPossibles = calculerCoupsPossibles(damier,trait);
+ 			for(Coup coup : coupsPossibles){
+ 				int[][] clone = damier.clone();
+ 				for(int i=0;i<clone.length;i++)
+ 					clone[i]=clone[i].clone();
+ 				executionCoup(clone,coup);
+ 				Noeud fils = new Noeud(racine,racine.getProfondeur()+1,clone);
+ 				racine.addFils(fils);
+ 				if(max)
+ 					fils.setGain(racine.getGain()+coup.getNbPiecesSupprimees());
+ 				else
+ 					fils.setGain(racine.getGain()-coup.getNbPiecesSupprimees());
+ 				fils.setCoup(coup);
+ 				Couleur traitAux = (trait==Couleur.BLANC)?Couleur.NOIR:Couleur.BLANC;
+ 				minMax(fils,traitAux,profondeurMax,!max);
+ 			}
+ 			
+ 			
+ 			ArrayList<Noeud> fils = racine.getFils();
+ 			if(max && !fils.isEmpty()){
+ 				int gmax = fils.get(0).getGain();
+ 				for(Noeud f : fils){
+ 					int gain = f.getGain();
+ 					gmax = ( gmax<gain )?gain:gmax ;
+ 				}
+ 				racine.setGain(gmax);
+ 			}
+ 			else if(!max && !fils.isEmpty()){
+ 				int gmin = fils.get(0).getGain();
+ 				for(Noeud f : fils){
+ 					int gain = f.getGain();
+ 					gmin = ( gmin<gain )?gmin:gain ;
+ 				}
+ 				racine.setGain(gmin);
+ 			}
+ 		}
+ 	}
+	
 	int vi=0;
 	//Noeud racine = new Noeud(null,profondeur,0,damier);
-	private void minMax(Noeud racine, final Couleur trait, final int profondeurMax, boolean max){
+	private void alphaBeta(Noeud racine, final Couleur trait, final int profondeurMax, boolean max){
 		if(racine.getProfondeur() < profondeurMax){
 			int[][] damier = racine.getEtat();
 			ArrayList<Coup> coupsPossibles = calculerCoupsPossibles(damier,trait);
@@ -778,7 +823,7 @@ public class Damier extends Plateau {
 				racine.addFils(fils);
 				fils.setCoup(coup);
 				Couleur traitAux = (trait==Couleur.BLANC)?Couleur.NOIR:Couleur.BLANC;
-				minMax(fils,traitAux,profondeurMax,!max);
+				alphaBeta(fils,traitAux,profondeurMax,!max);
 
 				//coupure beta
 				if(max){

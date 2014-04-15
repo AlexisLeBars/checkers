@@ -739,11 +739,11 @@ public class Damier extends Plateau {
 			System.out.println("Voies non parcourures: "+vi);
 			vi=0;
 			//int gain = racine.getGain();
-			int gain = AlphaBeta(racine, this.traitAux, 0, 4, true, -3000, 3000);
+			int gain = AlphaBeta(racine, this.traitAux, 0, 6, true, -3000, 3000);
 			System.out.println("gain final: "+gain);
 			Coup coupIA = null;
 			for(Noeud fils : racine.getFils()){
-				System.out.println("gain: "+fils.getGain());
+				//System.out.println("gain: "+fils.getGain());
 				if(fils.getGain() == gain)
 					coupIA = fils.getCoup();
 			}
@@ -846,6 +846,7 @@ public class Damier extends Plateau {
 	}
 	
 	int vi=0;
+	int alpha=-300,beta=300;
 	private void alphaBeta(Noeud racine, final Couleur trait, final int profondeurMax, boolean max){
 		if(racine.getProfondeur() < profondeurMax){
 			int[][] damier = racine.getEtat();
@@ -858,7 +859,7 @@ public class Damier extends Plateau {
 				Noeud fils = new Noeud(racine,racine.getProfondeur()+1,clone);
 				int evaluation = evaluationCoup(damier,coup);
 				if(max){
-                    fils.setGain(-racine.getGain()+evaluationCoup(damier, coup));
+                    fils.setGain(racine.getGain()+evaluationCoup(damier, coup));
                     if(coupsPossibles.indexOf(coup)==coupsPossibles.size()-1)
                         racine.setGain(-300);//valeur neutre
                 }
@@ -875,6 +876,7 @@ public class Damier extends Plateau {
 				//coupure beta
 				if(max){
 					if(racine.getGain()<fils.getGain()){
+						alpha=fils.getGain();
 						racine.setGain(fils.getGain());
 					}
 					if(racine.getProfondeur()!=0 && (racine.getParent().getGain()<fils.getGain())){
@@ -886,6 +888,7 @@ public class Damier extends Plateau {
 				//coupure alpha
 				else if(!max){
 					if(racine.getGain()>fils.getGain()){
+						beta=fils.getGain();
 						racine.setGain(fils.getGain());
 					}
 					if(racine.getProfondeur()!=0 && (racine.getParent().getGain()>fils.getGain())){
@@ -932,7 +935,7 @@ public class Damier extends Plateau {
 		int[][] damier = racine.getEtat();
 		ArrayList<Coup> coupsPossibles = calculerCoupsPossibles(damier,trait);
 		if(prof==profondeurMax){
-		       return evaluationCoup(damier, racine.getCoup());
+		       return racine.getGain();
 			 }
 		else{
 			best=-3000;
@@ -944,20 +947,25 @@ public class Damier extends Plateau {
 				Noeud fils = new Noeud(racine,racine.getProfondeur()+1,clone);
 				racine.addFils(fils);
 				fils.setCoup(coup);
+				if(max)
+					fils.setGain(racine.getGain()+evaluationCoup(damier, coup));
+				else
+					fils.setGain(racine.getGain()-evaluationCoup(damier, coup));
 				Couleur traitAux = (trait==Couleur.BLANC)?Couleur.NOIR:Couleur.BLANC;
-				val=-AlphaBeta(fils,traitAux,prof+1,profondeurMax,!max,-alpha,-beta);
+				val=-AlphaBeta(fils,traitAux,prof+1,profondeurMax,!max,-beta,-alpha);
 				if( val > best){
 	               best = val;
 	               if( best > alpha ){
 	                      alpha = best;
 	                      fils.setGain(alpha);
-	                   if( alpha >= beta){
+	                   if( alpha >= beta){//coupure
 	                	   vi++;
 	                       return best;
 	                   }
 	               }
 				}
 			}
+			racine.setGain(best);
 			return best;
 		}
 	}

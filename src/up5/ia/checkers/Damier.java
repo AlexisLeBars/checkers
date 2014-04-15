@@ -1,6 +1,9 @@
 package up5.ia.checkers;
 
+import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Pattern;
@@ -34,7 +37,8 @@ public class Damier extends Plateau {
 	private int positionPieceActive;
 	private Couleur traitAux;
 	
-	public int niveauIA;
+	public static int niveauIA;
+	public int vi;
 
 	public Damier(){
 		super(TAILLE);
@@ -47,7 +51,7 @@ public class Damier extends Plateau {
 		coupsPossibles = new ArrayList<Coup>();
 		positionPieceActive = 0;
 		disposerPions();
-		niveauIA=3;
+		niveauIA=1;
 	}
 
 	public Point positionToCoordonnees(final int position){
@@ -735,11 +739,26 @@ public class Damier extends Plateau {
 	// Si le nouveau joueur est l'IA
 		if(Lanceur.mode.getText()=="IA ON" && this.traitAux == Couleur.NOIR){
 			Noeud racine = new Noeud(null,0,damier);
+			int gain=0;
+			switch(niveauIA){
+			case 1:
+				minMax(racine, traitAux, 3, true);
+				gain = racine.getGain();
+				break;
+			case 2:
+				minMax(racine,traitAux,4,true);
+				gain=racine.getGain();
+				break;
+			case 3:
+				gain = AlphaBeta(racine, this.traitAux, 0, 6, true, -3000, 3000);
+				Lanceur.coupures.setText("Coupures A-B: "+vi);
+				break;
+
+			}
 			//alphaBeta(racine,this.traitAux,4,true);
 			System.out.println("Voies non parcourures: "+vi);
 			vi=0;
-			//int gain = racine.getGain();
-			int gain = AlphaBeta(racine, this.traitAux, 0, 6, true, -3000, 3000);
+			Lanceur.gain.setText("Gain IA: "+gain);
 			System.out.println("gain final: "+gain);
 			Coup coupIA = null;
 			for(Noeud fils : racine.getFils()){
@@ -844,9 +863,7 @@ public class Damier extends Plateau {
 			
 		return gain;
 	}
-	
-	int vi=0;
-	int alpha=-300,beta=300;
+	//alpha beta version simple
 	private void alphaBeta(Noeud racine, final Couleur trait, final int profondeurMax, boolean max){
 		if(racine.getProfondeur() < profondeurMax){
 			int[][] damier = racine.getEtat();
@@ -857,7 +874,7 @@ public class Damier extends Plateau {
 					clone[i]=clone[i].clone();//prends beaucoup trop de temps
 				executionCoup(clone,coup);
 				Noeud fils = new Noeud(racine,racine.getProfondeur()+1,clone);
-				int evaluation = evaluationCoup(damier,coup);
+				//int evaluation = evaluationCoup(damier,coup);
 				if(max){
                     fils.setGain(racine.getGain()+evaluationCoup(damier, coup));
                     if(coupsPossibles.indexOf(coup)==coupsPossibles.size()-1)
@@ -876,7 +893,6 @@ public class Damier extends Plateau {
 				//coupure beta
 				if(max){
 					if(racine.getGain()<fils.getGain()){
-						alpha=fils.getGain();
 						racine.setGain(fils.getGain());
 					}
 					if(racine.getProfondeur()!=0 && (racine.getParent().getGain()<fils.getGain())){
@@ -888,7 +904,6 @@ public class Damier extends Plateau {
 				//coupure alpha
 				else if(!max){
 					if(racine.getGain()>fils.getGain()){
-						beta=fils.getGain();
 						racine.setGain(fils.getGain());
 					}
 					if(racine.getProfondeur()!=0 && (racine.getParent().getGain()>fils.getGain())){
@@ -907,29 +922,9 @@ public class Damier extends Plateau {
 					racine.getParent().setGain(racine.getGain());
 				}
 			}
-
-			/*
-			ArrayList<Noeud> fils = racine.getFils();
-			if(max && !fils.isEmpty()){
-				int gmax = fils.get(0).getGain();
-				for(Noeud f : fils){
-					int gain = f.getGain();
-					gmax = ( gmax<gain )?gain:gmax ;
-				}
-				racine.setGain(gmax);
-			}
-			else if(!max && !fils.isEmpty()){
-				int gmin = fils.get(0).getGain();
-				for(Noeud f : fils){
-					int gain = f.getGain();
-					gmin = ( gmin<gain )?gmin:gain ;
-				}
-				racine.setGain(gmin);
-			}
-			*/
 		}
 	}
-	
+	//alpha beta version negamax
 	private int AlphaBeta(Noeud racine, final Couleur trait,int prof, final int profondeurMax, boolean max,int alpha,int beta) {
 		int val=0,best=0;
 		int[][] damier = racine.getEtat();

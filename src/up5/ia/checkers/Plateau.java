@@ -1,7 +1,10 @@
 package up5.ia.checkers;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 import javax.swing.JPanel;
 
@@ -22,15 +25,17 @@ public class Plateau extends JPanel {
 					ajouterCase(Couleur.NOIR, ++position);
 			}
 		}
-/*
-		this.addComponentListener(new ComponentAdapter() {
+
+		/*this.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-            	int height = (int) ((Component) e.getSource()).getSize().getHeight();
+            	/*int height = (int) ((Component) e.getSource()).getSize().getHeight();
                 int width = (int) ((Component) e.getSource()).getSize().getWidth();
                 int taille = (height<width)?height:width;
                 setSize(taille,taille);
                 Plateau.this.validate();
+                
+            	setSize(new Dimension(getSize().height, getSize().height));
             }
         });
 */
